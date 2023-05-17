@@ -46,10 +46,10 @@ def process(filename, language):
         text = re.sub('&amp;', '', text)
 
         # remove unnecessary blank spaces
-        #text = " ".join(text.split())
+        text = " ".join(text.split())
 
         # remove special characters
-        text = re.sub('[!,*)@#%(&$_?.^]', '', text)
+        text = re.sub('[!,*)@#%(&$_?.^:]', '', text)
 
         # Lemmatization and remove stopwords
         if language == "english":
@@ -61,7 +61,6 @@ def process(filename, language):
             nlp = spacy.load('de_core_news_sm')
             lemma_text = nlp(text)
             words = [word.lemma_.lower() for word in lemma_text if word.lemma_ not in (stop_words) and not re.match(r'\b\d+\b', word.lemma_)]
-
         results.append(words)
 
     return results
