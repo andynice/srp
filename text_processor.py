@@ -14,6 +14,7 @@ def read_data(filename):
 
 def tokenize_words(text):
     tokens = text.split()
+    tokens = [token for token in tokens if not re.match(r'\b\d+\b', token)]  # Remove standalone numbers
     return tokens
 
 def remove_stopwords(words, language):
