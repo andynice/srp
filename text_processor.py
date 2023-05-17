@@ -39,7 +39,7 @@ def process(filename, language):
         text = demoji.replace(text, repl="")
 
         # remove @s
-        clean_tweet = re.sub("@[A-Za-z0-9_]+", "", text)
+        text = re.sub("@[A-Za-z0-9_]+", "", text)
 
         # remove hashtags
         text = re.sub("#[A-Za-z0-9_]+", "", text)
