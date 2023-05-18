@@ -106,6 +106,9 @@ for date_range in date_ranges:
             # Clean text column
             df_data['clean_tweets'] = clean_text(df_data['tweet'], languages[lang_idx])
 
+            # Drop tweet column
+            df_data = df_data.drop(["tweet"], axis=1)
+
             # Count Frequencies
             df_data['freq_count'] = count_frequencies(df_data['clean_tweets'])
 
