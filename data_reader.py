@@ -87,6 +87,7 @@ def count_frequencies(text):
 file_exists = [False, False]
 # Output CSV file
 date_ranges = [['2021-01-04', '2021-01-05'], ['2021-02-04', '2021-02-05']]
+# date_ranges = [['2021-01-04', '2021-01-05']]
 
 languages = ['en', 'de']
 
@@ -117,10 +118,12 @@ for date_range in date_ranges:
             # Count Frequencies
             df_data['freq_count'] = count_frequencies(df_data['clean_tweets'])
 
-            output_file = f"output_{date_str}_{languages[lang_idx]}.csv"
+            # output_file = f"{languages[lang_idx]}_{date_str}_output.csv"
+            output_file = f"{languages[lang_idx]}_output.csv"
+
             print(f"saved file {output_file}")
             # Write processed data to output file
-            #df_data.to_csv(output_file, mode='a', index=False, header=not file_exists[lang_idx])
+            df_data.to_csv(output_file, mode='a', index=False, header=not file_exists[lang_idx])
 
             # Set file_exists to True after writing the header once
             file_exists[lang_idx] = True
