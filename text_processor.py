@@ -76,4 +76,3 @@ filename_de = "test_file_de_small.csv"
 language = "german"
 tweets = process(filename_de, language)
 print(tweets)
-
