@@ -62,6 +62,8 @@ def clean_text(data, language):
         text = " ".join(text.split())
 
         # remove special characters
+        ## Pending: remove ’
+        ## Pending: remove ' - '
         text = re.sub('[!,*)@#%(&$_?.^:]', '', text)
 
         # Lemmatization and remove stopwords
@@ -81,7 +83,6 @@ def clean_text(data, language):
 
 ## GENERATE FRAQUENCIES
 def count_frequencies(text):
-    print(f"text to count freqs:{text}")
     return text
 
 file_exists = [False, False]
@@ -119,7 +120,7 @@ for date_range in date_ranges:
             df_data['freq_count'] = count_frequencies(df_data['clean_tweets'])
 
             # output_file = f"{languages[lang_idx]}_{date_str}_output.csv"
-            output_file = f"{languages[lang_idx]}_output.csv"
+            output_file = f"./output/{languages[lang_idx]}_output.csv"
 
             print(f"saved file {output_file}")
             # Write processed data to output file
