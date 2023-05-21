@@ -45,13 +45,15 @@ def process(filename, language):
         # remove encoded characters
         text = re.sub('&amp;', '', text)
 
+        # replace '’' with '\'' so strings like i’ll won't be lost and stopwords can remove them
+        text = re.sub('’', '\'', text)
+
         # remove unnecessary blank spaces
         text = " ".join(text.split())
 
         # remove special characters
-        ## Pending: remove ’
         ## Pending: remove ' - '
-        text = re.sub('[!,*)@#%(&$_?.^:]', '', text)
+        text = re.sub('[!,*)@#%(&$_?.^:’]', '', text)
 
         # Lemmatization and remove stopwords
         if language == "en":
