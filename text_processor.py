@@ -49,30 +49,34 @@ def process(filename, language):
         text = " ".join(text.split())
 
         # remove special characters
+        ## Pending: remove ’
+        ## Pending: remove ' - '
         text = re.sub('[!,*)@#%(&$_?.^:]', '', text)
 
         # Lemmatization and remove stopwords
-        if language == "english":
+        if language == "en":
             stop_words = en_stopwords
             words = tokenize_words(text.lower())
             words = [WordNetLemmatizer().lemmatize(word) for word in words if word not in (stop_words)]
-        elif language == "german":
+        elif language == "de":
             stop_words = de_stopwords
             nlp = spacy.load('de_core_news_sm')
             lemma_text = nlp(text)
-            words = [word.lemma_.lower() for word in lemma_text if word.lemma_ not in (stop_words) and not re.match(r'\b\d+\b', word.lemma_)]
+            words = [word.lemma_.lower() for word in lemma_text if
+                     word.lemma_ not in (stop_words) and not re.match(r'\b\d+\b', word.lemma_)]
+
         results.append(words)
 
     return results
 
 ## English
 filename_en = "test_file_en_small.csv"
-language = "english"
+language = "en"
 tweets = process(filename_en, language)
 print(tweets)
 
 ## German
 filename_de = "test_file_de_small.csv"
-language = "german"
+language = "de"
 tweets = process(filename_de, language)
 print(tweets)
