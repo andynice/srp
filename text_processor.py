@@ -45,6 +45,9 @@ def process(filename, language):
         # remove encoded characters
         text = re.sub('&amp;', '', text)
 
+        # remove scores with spaces
+        text = re.sub(' - ', ' ', text)
+
         # replace '’' with '\'' so strings like i’ll won't be lost and stopwords can remove them
         text = re.sub('’', '\'', text)
 
@@ -52,7 +55,6 @@ def process(filename, language):
         text = " ".join(text.split())
 
         # remove special characters
-        ## Pending: remove ' - '
         text = re.sub('[!,*)@#%(&$_?.^:’]', '', text)
 
         # Lemmatization and remove stopwords
@@ -77,8 +79,10 @@ language = "en"
 tweets = process(filename_en, language)
 print(tweets)
 
-## German
-filename_de = "test_file_de_small.csv"
-language = "de"
-tweets = process(filename_de, language)
-print(tweets)
+# ## German
+# filename_de = "test_file_de_small.csv"
+# language = "de"
+# tweets = process(filename_de, language)
+# print(tweets)
+
+

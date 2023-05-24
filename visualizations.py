@@ -40,21 +40,21 @@ dates_generated = [start + datetime.timedelta(days=x) for x in range(0, (end - s
 
 # plot lines
 for idx, word in enumerate(most_freq_words_3):
-    plt.plot(dates_generated, freqs[idx], label=word)
+    plt.xlabel("Days")
+    plt.ylabel("Frequencies")
+    plt.title("Frequencies of word '" + word + "' VS. Days"
+              "\n during January and February 2021")
+    
+    ax = plt.gca()
+    ax.xaxis.set_major_locator(mdates.DayLocator(interval=10))
+    ax.xaxis.set_major_formatter(mdates.DateFormatter('%d-%m-%Y'))
+    plt.gcf().autofmt_xdate()  # Rotation
+    
+    plt.plot(dates_generated, freqs[idx])
+    plt.savefig('./output/visualizations/' + word + '-line-graph.png')
 
-plt.legend(loc='upper left')
-plt.xlabel("Days")
-plt.ylabel("Frequencies")
-plt.title("Frequencies VS. Days of 3 most frequent keywords"
-          "\n during January and February 2021")
+    plt.show()
 
-ax = plt.gca()
-ax.xaxis.set_major_locator(mdates.DayLocator(interval=10))
-ax.xaxis.set_major_formatter(mdates.DateFormatter('%d-%m-%Y'))
-plt.gcf().autofmt_xdate() # Rotation
-# plt.xticks(rotation=45)
-plt.savefig('./output/visualizations/mixed-line-graph.png')
-plt.show()
 
 
 ## BAR GRAPHS
