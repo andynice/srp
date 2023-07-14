@@ -28,3 +28,6 @@ DLL load failed while importing _imaging: The specified module could not be foun
 
 conda uninstall pillow --force-remove
 pip install pillow
+
+### Dataset - Number of covid cases
+https://github.com/owid/covid-19-data/blob/master/public/data/owid-covid-data.csv
