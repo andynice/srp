@@ -66,7 +66,7 @@ for individual_model in models:
 print('Total data in dataframe')
 total_dataframe = total_dataframe.drop(['abstract_tripples', 'text_tripples','entities','key_phrases'], axis=1)
 print(total_dataframe.shape)
-total_dataframe.head()
+print(total_dataframe.head())
 
 #************************************************************************************************
 total_dataframe.isnull().sum()
@@ -76,7 +76,7 @@ total_dataframe.dtypes
 tf_df = pd.DataFrame()
 tf_df['merged_text'] = total_dataframe['title'].astype(str) +  total_dataframe['abstract'].astype(str) +  total_dataframe['text'].astype(str)
 tf_df['paper_id'] = total_dataframe['paper_id']
-tf_df.head()
+print(tf_df.head())
 
 #************************************************************************************************
 ### This is word2vec training code we train it externaly and use the trained models
@@ -85,7 +85,7 @@ tf_df.head()
 
 tf_df['tokenized_text'] = tf_df.merged_text.apply(lambda row: word_tokenize(row))
 sent = tf_df.tokenized_text.to_list()
-len(sent)
+print(f"len(sent): {len(sent)}")
 phrases = Phrases(sent, min_count=30, progress_per=10000)
 bigram = Phraser(phrases)
 sentences = bigram[sent]
