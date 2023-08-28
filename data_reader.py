@@ -92,6 +92,8 @@ date_ranges = [['2021-01-04', '2021-01-05'], ['2021-02-04', '2021-02-05']]
 
 languages = ['en', 'de']
 
+cols_to_drop = ['tweet']
+
 for date_range in date_ranges:
 
     start = datetime.datetime.strptime(date_range[0], "%Y-%m-%d")
@@ -113,8 +115,8 @@ for date_range in date_ranges:
             print(df_data['clean_tweets'])
             print(df_data.head(5))
 
-            # Drop tweet column
-            df_data = df_data.drop(["tweet"], axis=1)
+            # Drop columns
+            df_data = df_data.drop(cols_to_drop, axis=1)
 
             # Count Frequencies
             df_data['freq_count'] = count_frequencies(df_data['clean_tweets'])
