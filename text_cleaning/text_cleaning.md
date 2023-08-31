@@ -95,6 +95,8 @@ rm ./punkt.zip
 ```
 scp [path]\2021-01-01.csv correa@master.ismll.de:/home/correa/text_cleaning/data
 scp [path]\2021-01-02.csv correa@master.ismll.de:/home/correa/text_cleaning/data
+
+scp correa@master.ismll.de:/home/correa/text_cleaning/output/en_output.csv [local-path]
 ```
 * Create the bash script "test.sh"
 ```
