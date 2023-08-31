@@ -111,15 +111,27 @@ vi word_embedding.py
 ```
 ## Prepare punkt model from nltk, for tokenization
 * Nodes are not connected to internet, so it's necessary to download first everything needed
+* Using the documentation from nltk https://www.nltk.org/data.html
 * Download the punkt model (zip file) from http://www.nltk.org/nltk_data/
 * Create the folder "/nltk_data/tokenizers" in the environment folder "/home/correa/miniconda3/envs/word2vec"
+```
+cd /home/correa/miniconda3/envs/word2vec
+
+mkdir nltk_data
+cd nltk_data
+mkdir tokenizers
+```
 * Upload the zip from local host to cluster
 ```
-scp [path]\punkt.zip correa@master.ismll.de:/home/correa/miniconda3/envs/word2vec/nltk_data
+scp [path]\punkt.zip correa@master.ismll.de:/home/correa/miniconda3/envs/word2vec/nltk_data/tokenizers
 ```
-* Unzip zip file into "nltk/tokenizers" folder
+* Unzip zip file into "nltk_data/tokenizers" folder
 ```
 unzip ./punkt.zip
+```
+* Delete zip file
+```
+rm ./punkt.zip
 ```
 ## Run script
 * Upload input file, from local host to cluster

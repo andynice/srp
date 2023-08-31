@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-#SBATCH --job-name=test
+#SBATCH --job-name=word2vec
 #SBATCH --output=test%j.log
 #SBATCH --error=test%j.err
 #SBATCH --mail-user=correa@uni-hildesheim.de
