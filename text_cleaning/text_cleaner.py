@@ -9,6 +9,7 @@ import nltk
 from nltk.stem import WordNetLemmatizer
 import spacy
 import datetime
+from time import time
 
 ## READ AND PROCESS DATAFRAME
 def read_date_file(date):
@@ -29,7 +30,7 @@ def filter_dataframe(df_data, langs):
 
     # Remove the minutes, seconds, and timezone offset
     # data['created_at'] = data['created_at'].dt.strftime('%Y-%m-%d %H:00:00')
-    filtered_df['created_at'] = filtered_df['created_at'].dt.strftime('%Y-%m-%d %H')
+    filtered_df['created_at'] = filtered_df['created_at'].dt.strftime('%Y-%m-%d')
 
     return [filtered_df[filtered_df["lang"] == lang] for lang in langs]
 
@@ -68,24 +69,25 @@ def clean_text(data, language, tokenize):
         text = " ".join(text.split())
 
         # remove special characters
+        text = re.sub('[!,*)@#%(&$_?.^:;"|’“„”\'…‘]', '', text)
 
-        text = re.sub('[!,*)@#%(&$_?.^:"|’-]', '', text)
+        # remove dash between any kind of space with space
+        text = re.sub('\s\-\s', ' ', text)
 
         # Lemmatization and remove stopwords
         if language == "en":
             stop_words = en_stopwords
             words = tokenize_words(text.lower())
             words = [WordNetLemmatizer().lemmatize(word) for word in words if word not in (stop_words)]
-            if not tokenize:
-                words = ' '.join(words)
 
         elif language == "de":
             stop_words = de_stopwords
             nlp = spacy.load('de_core_news_sm')
             lemma_text = nlp(text)
             words = [word.lemma_.lower() for word in lemma_text if word.lemma_ not in (stop_words) and not re.match(r'\b\d+\b', word.lemma_)]
-            if not tokenize:
-                words = ' '.join(words)
+
+        if not tokenize:
+            words = ' '.join(words)
 
         results.append(words)
 
@@ -95,17 +97,22 @@ def clean_text(data, language, tokenize):
 def count_frequencies(text):
     return text
 
-file_exists = [False, False]
 # Output CSV file
-date_ranges = [['2021-01-01', '2021-01-02']]
+date_ranges = [['2020-01-04', '2020-01-05']]
+
 # date_ranges = [['2021-01-01', '2021-01-02'], ['2021-02-01', '2021-02-02']]
-# date_ranges = [['2021-01-04', '2021-01-05'], ['2021-02-04', '2021-02-05']]
+# date_ranges = [['2021-01-04', '2021-01-06']]
 # date_ranges = [['2021-01-04', '2021-01-05']]
 
 languages = ['en']
 # languages = ['en', 'de']
 
+file_exists = [True]
+# file_exists = [False, False]
+
 cols_to_drop = ['tweet', 'lang']
+
+merge_tweets_by_date=True
 
 for date_range in date_ranges:
 
@@ -119,25 +126,40 @@ for date_range in date_ranges:
         filtered_dfs = filter_dataframe(df_data, languages)
         for lang_idx, df_data in enumerate(filtered_dfs):
             print(f"Processing file: {date_str} / language: {languages[lang_idx]}")
+            t = time()
 
             # Clean text column
             # df_data['tokenized_tweets'] = df_data['tweet'].apply(tokenize_words)
-            df_data['clean_tweets'] = clean_text(df_data['tweet'], languages[lang_idx], tokenize=False)
             # df_data["tokenized_tweets_n"] = df_data["tokenized_tweets"].apply(lambda n: len(n))
             # df_data["clean_tweets_n"] = df_data["clean_tweets"].apply(lambda n: len(n))
-
-            # Drop columns
-            df_data = df_data.drop(cols_to_drop, axis=1)
-
-            # Count Frequencies
-            # df_data['freq_count'] = count_frequencies(df_data['clean_tweets'])
+            df_data['clean_tweets'] = clean_text(df_data['tweet'], languages[lang_idx], tokenize=False)
 
             # output_file = f"{languages[lang_idx]}_{date_str}_output.csv"
             output_file = f"./output/{languages[lang_idx]}_output.csv"
 
+            if merge_tweets_by_date:
+
+                df_final_data = df_data.groupby('created_at', as_index=False)['clean_tweets'].apply(' '.join)
+
+                # remove duplicates, leave only unique words
+                df_final_data["clean_tweets"] = df_final_data["clean_tweets"].apply(lambda words: ' '.join(set(words.split())))
+
+                # Write processed data to output file
+                df_final_data.to_csv(output_file, mode='a', index=False, header=not file_exists[lang_idx])
+
+            else:
+
+                # Drop columns
+                df_data = df_data.drop(cols_to_drop, axis=1)
+
+                # Count Frequencies
+                # df_data['freq_count'] = count_frequencies(df_data['clean_tweets'])
+
+                # Write processed data to output file
+                df_data.to_csv(output_file, mode='a', index=False, header=not file_exists[lang_idx])
+
             print(f"saved file {output_file}")
-            # Write processed data to output file
-            df_data.to_csv(output_file, mode='a', index=False, header=not file_exists[lang_idx])
+            print('Time to build file: {} mins'.format(round((time() - t) / 60, 2)))
 
             # Set file_exists to True after writing the header once
             file_exists[lang_idx] = True

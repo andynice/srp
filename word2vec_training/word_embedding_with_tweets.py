@@ -54,7 +54,7 @@ print(f"cores: {cores}")
 # w2v_model = Word2Vec(min_count=20,
 w2v_model = Word2Vec(min_count=1,
                      window=2,
-                     vector_size=300,
+                     vector_size=500,
                      sample=6e-5,
                      alpha=0.03,
                      min_alpha=0.0007,
