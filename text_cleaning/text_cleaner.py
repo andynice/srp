@@ -46,52 +46,48 @@ def tokenize_words(text):
     tokens = [token for token in tokens if not re.match(r'\b\d+\b', token)]
     return tokens
 
-def clean_text(data, language, tokenize):
+def clean_text(text, language, tokenize):
 
-    results = []
-    for text in data:
-        # remove emojis
-        text = demoji.replace(text, repl="")
+    # remove emojis
+    text = demoji.replace(text, repl="")
 
-        # remove @s
-        text = re.sub("@[A-Za-z0-9_]+", "", text)
+    # remove @s
+    text = re.sub("@[A-Za-z0-9_]+", "", text)
 
-        # remove hashtags
-        text = re.sub("#[A-Za-z0-9_]+", "", text)
+    # remove hashtags
+    text = re.sub("#[A-Za-z0-9_]+", "", text)
 
-        # remove links
-        text = re.sub('http://\S+|https://\S+', '', text)
+    # remove links
+    text = re.sub('http://\S+|https://\S+', '', text)
 
-        # remove encoded characters
-        text = re.sub('&amp;', '', text)
+    # remove encoded characters
+    text = re.sub('&amp;', '', text)
 
-        # remove unnecessary blank spaces
-        text = " ".join(text.split())
+    # remove unnecessary blank spaces
+    text = " ".join(text.split())
 
-        # remove special characters
-        text = re.sub('[!,*)@#%(&$_?.^:;"|’“„”\'…‘]', '', text)
+    # remove special characters
+    text = re.sub('[!,*)@#%(&$_?.^:;"|’“„”\'…‘]', '', text)
 
-        # remove dash between any kind of space with space
-        text = re.sub('\s\-\s', ' ', text)
+    # remove dash between any kind of space with space
+    text = re.sub('\s\-\s', ' ', text)
 
-        # Lemmatization and remove stopwords
-        if language == "en":
-            stop_words = en_stopwords
-            words = tokenize_words(text.lower())
-            words = [WordNetLemmatizer().lemmatize(word) for word in words if word not in (stop_words)]
+    # Lemmatization and remove stopwords
+    if language == "en":
+        stop_words = en_stopwords
+        words = tokenize_words(text.lower())
+        words = [WordNetLemmatizer().lemmatize(word) for word in words if word not in (stop_words)]
 
-        elif language == "de":
-            stop_words = de_stopwords
-            nlp = spacy.load('de_core_news_sm')
-            lemma_text = nlp(text)
-            words = [word.lemma_.lower() for word in lemma_text if word.lemma_ not in (stop_words) and not re.match(r'\b\d+\b', word.lemma_)]
+    elif language == "de":
+        stop_words = de_stopwords
+        nlp = spacy.load('de_core_news_sm')
+        lemma_text = nlp(text)
+        words = [word.lemma_.lower() for word in lemma_text if word.lemma_ not in (stop_words) and not re.match(r'\b\d+\b', word.lemma_)]
 
-        if not tokenize:
-            words = ' '.join(words)
+    if not tokenize:
+        words = ' '.join(words)
 
-        results.append(words)
-
-    return results
+    return words
 
 ## GENERATE FRAQUENCIES
 def count_frequencies(text):
@@ -99,6 +95,7 @@ def count_frequencies(text):
 
 # Output CSV file
 date_ranges = [['2020-01-04', '2020-01-05']]
+# date_ranges = [['2021-01-01', '2021-01-02']]
 
 # date_ranges = [['2021-01-01', '2021-01-02'], ['2021-02-01', '2021-02-02']]
 # date_ranges = [['2021-01-04', '2021-01-06']]
@@ -107,7 +104,7 @@ date_ranges = [['2020-01-04', '2020-01-05']]
 languages = ['en']
 # languages = ['en', 'de']
 
-file_exists = [True]
+file_exists = [False]
 # file_exists = [False, False]
 
 cols_to_drop = ['tweet', 'lang']
@@ -132,7 +129,10 @@ for date_range in date_ranges:
             # df_data['tokenized_tweets'] = df_data['tweet'].apply(tokenize_words)
             # df_data["tokenized_tweets_n"] = df_data["tokenized_tweets"].apply(lambda n: len(n))
             # df_data["clean_tweets_n"] = df_data["clean_tweets"].apply(lambda n: len(n))
-            df_data['clean_tweets'] = clean_text(df_data['tweet'], languages[lang_idx], tokenize=False)
+            
+            # df_data['clean_tweets'] = clean_text(df_data['tweet'], languages[lang_idx], tokenize=False)
+
+            df_data["clean_tweets"] = df_data["tweet"].apply(lambda tweet: clean_text(tweet, languages[lang_idx], tokenize=False))
 
             # output_file = f"{languages[lang_idx]}_{date_str}_output.csv"
             output_file = f"./output/{languages[lang_idx]}_output.csv"
