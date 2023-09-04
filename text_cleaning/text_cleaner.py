@@ -117,8 +117,8 @@ def count_frequencies(text):
     return text
 
 # Output CSV file
-# date_ranges = [['2020-01-05', '2020-01-06']]
-date_ranges = [['2021-01-03', '2021-01-04']]
+# date_ranges = [['2020-01-04', '2020-01-06'], ['2020-02-04', '2020-02-05']]
+date_ranges = [['2021-01-01', '2021-02-01'], ['2021-02-01', '2021-03-01']]
 
 # date_ranges = [['2021-01-01', '2021-01-02'], ['2021-02-01', '2021-02-02']]
 # date_ranges = [['2021-01-04', '2021-01-06']]
@@ -129,7 +129,7 @@ merge_tweets_by_date=True
 languages = ['en']
 # languages = ['en', 'de']
 
-file_exists = [True]
+# file_exists = [False]
 # file_exists = [False, False]
 
 cols_to_drop = ['tweet', 'lang']
@@ -144,6 +144,7 @@ for date_range in date_ranges:
 
     for date in date_generated:
         date_str = date.strftime("%Y-%m-%d")
+        print(f"Date: {date_str}")
         df_data = read_date_file(date_str)
         filtered_dfs = filter_dataframe(df_data, languages)
         for lang_idx, df_data in enumerate(filtered_dfs):
@@ -158,18 +159,19 @@ for date_range in date_ranges:
             filtered_df_by_lang = df_data['lang'] == languages[lang_idx]
             df_data["clean_tweets"] = df_data[filtered_df_by_lang]["tweet"].apply(lambda tweet: clean_text(tweet, languages[lang_idx], tokenize=False))
 
-            # output_file = f"{languages[lang_idx]}_{date_str}_output.csv"
-            output_file = f"./output/{languages[lang_idx]}_output.csv"
+            output_file = f"./output/{languages[lang_idx]}_{date_str}_output.csv"
+            # output_file = f"./output/{languages[lang_idx]}_output.csv"
 
             if merge_tweets_by_date:
 
                 df_final_data = df_data.groupby('created_at', as_index=False)['clean_tweets'].apply(' '.join)
 
                 # remove duplicates, leave only unique words
-                df_final_data["clean_tweets"] = df_final_data["clean_tweets"].apply(lambda words: ' '.join(set(words.split())))
+                # df_final_data["clean_tweets"] = df_final_data["clean_tweets"].apply(lambda words: ' '.join(set(words.split())))
 
                 # Write processed data to output file
-                df_final_data.to_csv(output_file, mode='a', index=False, header=not file_exists[lang_idx])
+                # df_final_data.to_csv(output_file, mode='a', index=False, header=not file_exists[lang_idx])
+                df_final_data.to_csv(output_file, mode='a', index=False, header=True)
 
             else:
 
@@ -180,10 +182,11 @@ for date_range in date_ranges:
                 # df_data['freq_count'] = count_frequencies(df_data['clean_tweets'])
 
                 # Write processed data to output file
-                df_data.to_csv(output_file, mode='a', index=False, header=not file_exists[lang_idx])
+                # df_data.to_csv(output_file, mode='a', index=False, header=not file_exists[lang_idx])
+                df_data.to_csv(output_file, mode='a', index=False, header=True)
 
             print(f"saved file {output_file}")
             print('Time to build file: {} mins'.format(round((time() - t) / 60, 2)))
 
             # Set file_exists to True after writing the header once
-            file_exists[lang_idx] = True
+            # file_exists[lang_idx] = True
