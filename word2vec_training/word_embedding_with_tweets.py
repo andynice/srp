@@ -10,6 +10,7 @@ import json
 import pickle
 import glob
 import multiprocessing
+import datetime
 from time import time
 
 from gensim.models import Word2Vec
@@ -20,27 +21,42 @@ from nltk.tokenize import word_tokenize
 print('starting execution')
 
 #************************************************************************************************
+total_dataframe = pd.DataFrame()
+date_ranges = [['2021-01-01', '2021-02-01'], ['2021-02-01', '2021-03-01']]
+for date_range in date_ranges:
+    start = datetime.datetime.strptime(date_range[0], "%Y-%m-%d")
+    end = datetime.datetime.strptime(date_range[1], "%Y-%m-%d")
+    date_generated = [start + datetime.timedelta(days=x) for x in range(0, (end - start).days)]
 
-filename = "./data/en_output.csv"
-tf_df = pd.read_csv(filename)
+    for date in date_generated:
+        date_str = date.strftime("%Y-%m-%d")
+
+        filename = f"./data/en_{date_str}_output.csv"
+        df_data = pd.read_csv(filename)
+        print(f"df_data.shape: {df_data.shape}")
+        df_data = df_data.replace(r'^\s*$', np.nan, regex=True)
+        total_dataframe = total_dataframe.append(df_data, ignore_index=True)
+        print(df_data.isnull().sum())
 
 #************************************************************************************************
 
 print('Total data in dataframe')
-print(tf_df.shape)
-print(tf_df.head())
+print(f'total_dataframe.shape: {total_dataframe.shape}')
+print(f'total_dataframe.head(): {total_dataframe.head()}')
+# output_file = "./output/test_output.csv"
+# total_dataframe.to_csv(output_file, mode='a', index=False, header=True)
 
 #************************************************************************************************
-tf_df.isnull().sum()
+print(f"total_dataframe.isnull().sum(): {total_dataframe.isnull().sum()}")
 #************************************************************************************************
-tf_df.dtypes
+print(f"total_dataframe.dtypes: {total_dataframe.dtypes}")
 #************************************************************************************************
-### This is word2vec training code we train it externaly and use the trained models
+## This is word2vec training code we train it externaly and use the trained models
 
-#sent = [row.split() for row in tf_df['merged_text']]
+# sent = [row.split() for row in total_dataframe['merged_text']]
 
-tf_df['tokenized_text'] = tf_df['clean_tweets'].apply(lambda row: word_tokenize(row))
-sent = tf_df.tokenized_text.to_list()
+total_dataframe['tokenized_text'] = total_dataframe['clean_tweets'].apply(lambda row: word_tokenize(row))
+sent = total_dataframe.tokenized_text.to_list()
 # print(f"sent: {sent}")
 print(f"len(sent): {len(sent)}")
 phrases = Phrases(sent, min_count=30, progress_per=10000)
@@ -52,7 +68,7 @@ print(f"cores: {cores}")
 
 
 # w2v_model = Word2Vec(min_count=20,
-w2v_model = Word2Vec(min_count=1,
+w2v_model = Word2Vec(min_count=20,
                      window=2,
                      vector_size=500,
                      sample=6e-5,
