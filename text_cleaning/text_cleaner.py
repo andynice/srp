@@ -41,9 +41,16 @@ en_stopwords = ["able","about","above","abroad","according","accordingly","acros
 en_stopwords.remove("research")
 # add words
 # dont word is not part of non-stop words in english
-en_stopwords.append("dont")
-en_stopwords.append("wouldnt")
-en_stopwords.append("ill")
+# en_stopwords.append("dont")
+# en_stopwords.append("wouldnt")
+# en_stopwords.append("ill")
+# en_stopwords.append("itll")
+# en_stopwords.append("weve")
+# en_stopwords.append("ive")
+en_stopwords.append("would've")
+en_stopwords.append("wouldve")
+en_stopwords.append("y'all")
+en_stopwords.append("y'all's")
 
 de_stopwords = ["a","ab","aber","ach","acht","achte","achten","achter","achtes","ag","alle","allein","allem","allen","aller","allerdings","alles","allgemeinen","als","also","am","an","andere","anderen","andern","anders","au","auch","auf","aus","ausser","außer","ausserdem","außerdem","b","bald","bei","beide","beiden","beim","beispiel","bekannt","bereits","besonders","besser","besten","bin","bis","bisher","bist","c","d","da","dabei","dadurch","dafür","dagegen","daher","dahin","dahinter","damals","damit","danach","daneben","dank","dann","daran","darauf","daraus","darf","darfst","darin","darüber","darum","darunter","das","dasein","daselbst","dass","daß","dasselbe","davon","davor","dazu","dazwischen","dein","deine","deinem","deiner","dem","dementsprechend","demgegenüber","demgemäss","demgemäß","demselben","demzufolge","den","denen","denn","denselben","der","deren","derjenige","derjenigen","dermassen","dermaßen","derselbe","derselben","des","deshalb","desselben","dessen","deswegen","d.h","dich","die","diejenige","diejenigen","dies","diese","dieselbe","dieselben","diesem","diesen","dieser","dieses","dir","doch","dort","drei","drin","dritte","dritten","dritter","drittes","du","durch","durchaus","dürfen","dürft","durfte","durften","e","eben","ebenso","ehrlich","ei","ei,","eigen","eigene","eigenen","eigener","eigenes","ein","einander","eine","einem","einen","einer","eines","einige","einigen","einiger","einiges","einmal","eins","elf","en","ende","endlich","entweder","er","Ernst","erst","erste","ersten","erster","erstes","es","etwa","etwas","euch","f","früher","fünf","fünfte","fünften","fünfter","fünftes","für","g","gab","ganz","ganze","ganzen","ganzer","ganzes","gar","gedurft","gegen","gegenüber","gehabt","gehen","geht","gekannt","gekonnt","gemacht","gemocht","gemusst","genug","gerade","gern","gesagt","geschweige","gewesen","gewollt","geworden","gibt","ging","gleich","gott","gross","groß","grosse","große","grossen","großen","grosser","großer","grosses","großes","gut","gute","guter","gutes","h","habe","haben","habt","hast","hat","hatte","hätte","hatten","hätten","heisst","her","heute","hier","hin","hinter","hoch","i","ich","ihm","ihn","ihnen","ihr","ihre","ihrem","ihren","ihrer","ihres","im","immer","in","indem","infolgedessen","ins","irgend","ist","j","ja","jahr","jahre","jahren","je","jede","jedem","jeden","jeder","jedermann","jedermanns","jedoch","jemand","jemandem","jemanden","jene","jenem","jenen","jener","jenes","jetzt","k","kam","kann","kannst","kaum","kein","keine","keinem","keinen","keiner","kleine","kleinen","kleiner","kleines","kommen","kommt","können","könnt","konnte","könnte","konnten","kurz","l","lang","lange","leicht","leide","lieber","los","m","machen","macht","machte","mag","magst","mahn","man","manche","manchem","manchen","mancher","manches","mann","mehr","mein","meine","meinem","meinen","meiner","meines","mensch","menschen","mich","mir","mit","mittel","mochte","möchte","mochten","mögen","möglich","mögt","morgen","muss","muß","müssen","musst","müsst","musste","mussten","n","na","nach","nachdem","nahm","natürlich","neben","nein","neue","neuen","neun","neunte","neunten","neunter","neuntes","nicht","nichts","nie","niemand","niemandem","niemanden","noch","nun","nur","o","ob","oben","oder","offen","oft","ohne","Ordnung","p","q","r","recht","rechte","rechten","rechter","rechtes","richtig","rund","s","sa","sache","sagt","sagte","sah","satt","schlecht","Schluss","schon","sechs","sechste","sechsten","sechster","sechstes","sehr","sei","seid","seien","sein","seine","seinem","seinen","seiner","seines","seit","seitdem","selbst","sich","sie","sieben","siebente","siebenten","siebenter","siebentes","sind","so","solang","solche","solchem","solchen","solcher","solches","soll","sollen","sollte","sollten","sondern","sonst","sowie","später","statt","t","tag","tage","tagen","tat","teil","tel","tritt","trotzdem","tun","u","über","überhaupt","übrigens","uhr","um","und","und?","uns","unser","unsere","unserer","unter","v","vergangenen","viel","viele","vielem","vielen","vielleicht","vier","vierte","vierten","vierter","viertes","vom","von","vor","w","wahr?","während","währenddem","währenddessen","wann","war","wäre","waren","wart","warum","was","wegen","weil","weit","weiter","weitere","weiteren","weiteres","welche","welchem","welchen","welcher","welches","wem","wen","wenig","wenige","weniger","weniges","wenigstens","wenn","wer","werde","werden","werdet","wessen","wie","wieder","will","willst","wir","wird","wirklich","wirst","wo","wohl","wollen","wollt","wollte","wollten","worden","wurde","würde","wurden","würden","x","y","z","z.b","zehn","zehnte","zehnten","zehnter","zehntes","zeit","zu","zuerst","zugleich","zum","zunächst","zur","zurück","zusammen","zwanzig","zwar","zwei","zweite","zweiten","zweiter","zweites","zwischen","zwölf","euer","eure","hattest","hattet","jedes","mußt","müßt","sollst","sollt","soweit","weshalb","wieso","woher","wohin"]
 
@@ -59,6 +66,7 @@ def clean_text(text, language, tokenize):
     else:
         words = ""
     if isinstance(text, str):
+
         # remove emojis
         text = demoji.replace(text, repl="")
 
@@ -74,23 +82,26 @@ def clean_text(text, language, tokenize):
         # remove encoded characters
         text = re.sub('&amp;', '', text)
 
+        # replace '’' with '''
+        text = re.sub('[’]+', '\'', text)
+
         # remove special characters
-        text = re.sub('[\\\\!,*)@#%(&$_?^:;"|’“„”\'…‘/\+{}\[\]]+', '', text) # //so
+        text = re.sub('[\\\\!~•›\.=£►,*)@#%(&$_?^:;"|’“„”…‘/\+{}\[\]]+', ' ', text) # //so
 
-        # remove '-' between any kind of space with space
-        text = re.sub('\s\-+\s', ' ', text) # --- -> 
+        # replace '-' or '—' or '–' between any kind of space, with space
+        text = re.sub('\s[\-—–]+\s', ' ', text) # --- -> 
 
-        # remove '-' after or before words
-        text = re.sub(r'(?!\b[-]+\b)(\b-+|-+\b)', '', text) # where-- -> where-- -> where | -since -> since | gestapo-like -> gestapo-like
+        # remove '-' or '—' or '–' after or before words
+        text = re.sub(r'(?!\b[-—–]+\b)(\b[-—–]+|[-—–]+\b)', '', text) # where-- -> where | -since -> since | gestapo-like -> gestapo-like
 
-        # replace '.' surrounded by words with blank space
-        text = re.sub(r'\b\.+\b', ' ', text) # challenge.....covid -> challenge covid
+        # replace ''' between any kind of space, with space
+        text = re.sub('\s+\'+\s+', ' ', text) # ' ->
 
-        # replace '.' before or after words with blank space
-        text = re.sub(r'(\.+\b|\b\.+)', ' ', text) # ...thousands -> thousands
+        # remove ''' after words
+        text = re.sub(r'\b\'+\s+|\b\'+\s+$', ' ', text) # alert' -> alert 
 
-        # remove '.' flying around spaces
-        text = re.sub(r'(\w+)\.', r'\1 ', text) # house. today -> house today
+        # remove ''' before words
+        text = re.sub(r'^\'+\b|\s+\'+\b', ' ', text) # 'pandering -> pandering
 
         # Lemmatization and remove stopwords
         if language == "en":
@@ -106,9 +117,15 @@ def clean_text(text, language, tokenize):
             nlp = spacy.load('de_core_news_sm')
             lemma_text = nlp(text)
             words = [word.lemma_.lower() for word in lemma_text if word.lemma_ not in (stop_words) and not re.match(r'\b\d+\b', word.lemma_)]
+        
+        text = " ".join(words)
 
-        if not tokenize:
-            words = ' '.join(words)
+        # remove ''' after words
+        words = re.sub(r'\b\'s', '', text) # trump's -> trump 
+
+        if tokenize:
+            # words = " ".join(words)
+            words = words.split()
 
     return words
 
@@ -118,15 +135,12 @@ def count_frequencies(text):
 
 # Output CSV file
 # date_ranges = [['2021-01-01', '2021-02-01'], ['2021-02-01', '2021-03-01']]
-# date_ranges = [['2021-01-03', '2021-01-05'], ['2021-01-06', '2021-01-07'], ['2021-01-08', '2021-01-09'], 
-# ['2021-01-10', '2021-01-12'], ['2021-01-13', '2021-01-15'], ['2021-01-16', '2021-01-17'],
-# ['2021-01-21', '2021-01-23'], ['2021-01-28', '2021-01-29'], ['2021-01-30', '2021-01-31'],
-# ['2021-02-01', '2021-02-03']]
 
-date_ranges = [['2021-01-01', '2021-01-04']]
+date_ranges = [['2021-01-01', '2021-01-02']]
+# date_ranges = [['2020-01-04', '2020-01-05']]
 
-# merge_tweets_by_date=True
 merge_tweets_by_date=True
+# merge_tweets_by_date=False
 
 languages = ['en']
 # languages = ['en', 'de']
