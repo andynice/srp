@@ -86,13 +86,13 @@ def clean_text(text, language, tokenize):
         text = re.sub('[’]+', '\'', text)
 
         # remove special characters
-        text = re.sub('[\\\\!~•›\.=£►,*)@#%(&$_?^:;"|’“„”…‘/\+{}\[\]]+', ' ', text) # //so
+        text = re.sub('[\\\\!~•›\.=£►,*)@#%(&$_?^:;"|’“„”…‘/\+{}\[\]\-—–]+', ' ', text) # //so
 
         # replace '-' or '—' or '–' between any kind of space, with space
-        text = re.sub('\s[\-—–]+\s', ' ', text) # --- -> 
+        # text = re.sub('\s[\-—–]+\s', ' ', text) # --- -> 
 
         # remove '-' or '—' or '–' after or before words
-        text = re.sub(r'(?!\b[-—–]+\b)(\b[-—–]+|[-—–]+\b)', '', text) # where-- -> where | -since -> since | gestapo-like -> gestapo-like
+        # text = re.sub(r'(?!\b[-—–]+\b)(\b[-—–]+|[-—–]+\b)', '', text) # where-- -> where | -since -> since | gestapo-like -> gestapo like
 
         # replace ''' between any kind of space, with space
         text = re.sub('\s+\'+\s+', ' ', text) # ' ->
@@ -102,6 +102,9 @@ def clean_text(text, language, tokenize):
 
         # remove ''' before words
         text = re.sub(r'^\'+\b|\s+\'+\b', ' ', text) # 'pandering -> pandering
+
+        # remove foreign charactes
+        text = re.sub(r'[^A-Za-z\s]', '', text)
 
         # Lemmatization and remove stopwords
         if language == "en":
