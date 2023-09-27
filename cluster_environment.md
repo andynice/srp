@@ -2,7 +2,7 @@
 ## connect to cluster
 using the credentials provided by email
 ssh correa@master.ismll.de
-/***
+
 
 ## install miniconda
 * Check OS in cluster
