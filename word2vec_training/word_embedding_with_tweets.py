@@ -35,7 +35,8 @@ for date_range in date_ranges:
         df_data = pd.read_csv(filename)
         print(f"df_data.shape: {df_data.shape}")
         df_data = df_data.replace(r'^\s*$', np.nan, regex=True)
-        total_dataframe = total_dataframe.append(df_data, ignore_index=True)
+        # total_dataframe = total_dataframe.append(df_data, ignore_index=True)
+        total_dataframe = pd.concat([total_dataframe, df_data], ignore_index=True)
         print(df_data.isnull().sum())
 
 #************************************************************************************************

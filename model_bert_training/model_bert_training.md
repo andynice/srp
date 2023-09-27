@@ -1,50 +1,52 @@
 # Cluster environment for text cleaning
 
 ## create an environment
-* Create a new environment "text_cleaning" with python 3.10
+* Create a new environment "clean_text" with python 3.10
 ```
-(base) correa@master:~$ conda create -n text_cleaning python=3.10.11
+(base) correa@master:~$ conda create -n model_bert_training python=3.10.11
 ```
 * Confirm it was created
 ```
 conda info --envs
 # conda environments:
 #
-                         /home/correa/ENTER
-                         /home/correa/ENTER/envs/word2vec
 base                  *  /home/correa/miniconda3
-text_cleaning            /home/correa/miniconda3/envs/text_cleaning
+clean_text               /home/correa/miniconda3/envs/clean_text
+word2vec                 /home/correa/miniconda3/envs/word2vec
+word2vec                 /home/correa/miniconda3/envs/model_bert_training
 ```
-* From the base environment, install the following packages in the "text_cleaning" environment
-  * pandas
-  * demoji
+* From the base environment, install the following packages in the "model_bert_training" environment
+  * huggingface transformers
+  * pytorch
   * nltk
   * spacy
 ```
-conda install -n text_cleaning pandas
-conda install -n text_cleaning nltk
-conda install -n text_cleaning spacy
-
-conda activate text_cleaning
-
-pip install demoji
-python -m spacy download de
+conda install -n model_bert_training -c huggingface transformers
+conda install -n model_bert_training -c huggingface -c conda-forge datasets
+conda install -n model_bert_training pytorch torchvision -c pytorch
+conda install -n model_bert_training numpy
+conda install -n model_bert_training scikit-learn
+conda install -n model_bert_training -c conda-forge accelerate
+conda install -n model_bert_training pandas
 ```
-* To check the version installed for each library we can activate the environment "text_cleaning" and run the command to list
-* the installed libraries
+* To check the version installed for each library we can activate the environment "model_bert_training" and run the command * to list the installed libraries
 ```
-conda activate text_cleaning
+conda activate model_bert_training
 conda list
 ...
-pandas                    2.0.3           py310h1128e8f_0
-de-core-news-sm           3.5.0                    pypi_0    pypi
-demoji                    1.1.0                    pypi_0    pypi
-nltk                      3.8.1           py310h06a4308_0
-spacy                     3.5.3           py310h3c18c91_0
+huggingface_hub           0.17.2                     py_0    huggingface
+datasets                  2.14.5                     py_0    huggingface
+transformers              4.32.1          py310haa95532_0
+pytorch                   2.0.1              py3.10_cpu_0    pytorch
+pytorch-mutex             1.0                         cpu    pytorch
+torchvision               0.15.2                py310_cpu    pytorch
+numpy                     1.25.2          py310h055cbcc_0
+scikit-learn              1.3.0           py310h4ed8f06_0
+accelerate                0.23.0             pyhd8ed1ab_0    conda-forge
 ```
 * In case we need to delete the environment
 ```
-conda remove --name text_cleaning --all
+conda remove --name clean_text --all
 ```
 # Text cleaning
 ## Prepare directory
@@ -71,9 +73,9 @@ vi text_cleaner.py
 * Using the documentation from nltk https://www.nltk.org/data.html
 * Download the wordnet corpora (zip file) from http://www.nltk.org/nltk_data/ 
 * Link for downloading directly (https://raw.githubusercontent.com/nltk/nltk_data/gh-pages/packages/corpora/wordnet.zip)
-* Create the folder "/nltk_data/corpora" in the environment folder "/home/correa/miniconda3/envs/text_cleaning"
+* Create the folder "/nltk_data/corpora" in the environment folder "/home/correa/miniconda3/envs/clean_text"
 ```
-cd /home/correa/miniconda3/envs/text_cleaning
+cd /home/correa/miniconda3/envs/clean_text
 
 mkdir nltk_data
 cd nltk_data
@@ -81,15 +83,15 @@ mkdir corpora
 ```
 * Upload the zip from local host to cluster
 ```
-scp [path]\wordnet.zip correa@master.ismll.de:/home/correa/miniconda3/envs/text_cleaning/nltk_data/corpora
+scp [path]\wordnet.zip correa@master.ismll.de:/home/correa/miniconda3/envs/clean_text/nltk_data
 ```
-* Unzip zip file into "nltk_data/corpora" folder
+* Unzip zip file into "nltk_data/tokenizers" folder
 ```
 unzip ./wordnet.zip
 ```
 * Delete zip file
 ```
-rm ./wordnet.zip
+rm ./punkt.zip
 ```
 ## Run script
 * Upload input file, from local host to cluster

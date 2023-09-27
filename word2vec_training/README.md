@@ -70,7 +70,10 @@ conda 23.5.0
 conda info --envs
 # conda environments:
 #
+                         /home/correa/ENTER
+                         /home/correa/ENTER/envs/word2vec
 base                  *  /home/correa/miniconda3
+text_cleaning            /home/correa/miniconda3/envs/text_cleaning
 word2vec                 /home/correa/miniconda3/envs/word2vec
 ```
 * From the base environment, install the following packages in the "word2vec" environment
@@ -83,6 +86,10 @@ conda install -n word2vec nltk
 conda install -n word2vec numpy
 conda install -n word2vec pandas
 conda install -n word2vec gensim
+
+conda activate word2vec
+
+pip3 install -U scikit-learn
 ```
 * To check the version installed for each library we can activate the environment "word2vec" and run the command to list
 * the installed libraries
@@ -92,8 +99,9 @@ conda list
 ...
 nltk                      3.8.1           py310haa95532_0
 numpy                     1.25.0          py310h055cbcc_0
-pandas                    1.5.3           py310h4ed8f06_0
+pandas                    2.0.3           py310h1128e8f_0
 gensim                    4.3.0           py310h4ed8f06_0
+scikit-learn              1.3.1                    pypi_0    pypi
 ```
 * In case we need to delete the environment
 ```
@@ -134,9 +142,11 @@ unzip ./punkt.zip
 rm ./punkt.zip
 ```
 ## Run script
-* Upload input file, from local host to cluster
+* Create folder "/home/correa/word2vec_training"
+* Create "data" folder into the folder "/home/correa/word2vec_training"
+* Upload input files to data folder
 ```
-scp [path]\biorxiv_medrxiv.pickle correa@master.ismll.de:/home/correa/word2vec_training
+scp [path]\en_2021-01-04_output correa@master.ismll.de:/home/correa/word2vec_training/data
 ```
 * Create the bash script "test.sh"
 ```
