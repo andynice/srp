@@ -1,0 +1,9 @@
+**/.idea
+**/data
+**/output
+/models
+*.model
+*.zip
+*.pickle
+*.ipynb
+*.pdf
