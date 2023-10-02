@@ -40,13 +40,6 @@ en_stopwords = ["able","about","above","abroad","according","accordingly","acros
 # research word is part of non-stop words in english
 en_stopwords.remove("research")
 # add words
-# dont word is not part of non-stop words in english
-# en_stopwords.append("dont")
-# en_stopwords.append("wouldnt")
-# en_stopwords.append("ill")
-# en_stopwords.append("itll")
-# en_stopwords.append("weve")
-# en_stopwords.append("ive")
 en_stopwords.append("would've")
 en_stopwords.append("wouldve")
 en_stopwords.append("y'all")
@@ -175,8 +168,6 @@ for date_range in date_ranges:
             # df_data["tokenized_tweets_n"] = df_data["tokenized_tweets"].apply(lambda n: len(n))
             # df_data["clean_tweets_n"] = df_data["clean_tweets"].apply(lambda n: len(n))
 
-            # filtered_df_by_lang = df_data['lang'] == languages[lang_idx]
-            # df_data["clean_tweets"] = df_data[filtered_df_by_lang]["tweet"].apply(lambda tweet: clean_text(tweet, languages[lang_idx], tokenize=False))
             df_data["clean_tweets"] = df_data["tweet"].apply(lambda tweet: clean_text(tweet, languages[lang_idx], tokenize=False))
 
             output_file = f"./output/{languages[lang_idx]}_{date_str}_output.csv"
@@ -185,9 +176,6 @@ for date_range in date_ranges:
             if merge_tweets_by_date:
 
                 df_final_data = df_data.groupby('created_at', as_index=False)['clean_tweets'].apply(' '.join)
-
-                # remove duplicates, leave only unique words
-                # df_final_data["clean_tweets"] = df_final_data["clean_tweets"].apply(lambda words: ' '.join(set(words.split())))
 
                 # Write processed data to output file
                 # df_final_data.to_csv(output_file, mode='a', index=False, header=not file_exists[lang_idx])
