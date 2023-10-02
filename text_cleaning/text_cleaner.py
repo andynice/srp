@@ -135,14 +135,11 @@ def count_frequencies(text):
 date_ranges = [['2021-01-01', '2021-01-02']]
 # date_ranges = [['2020-01-04', '2020-01-05']]
 
-merge_tweets_by_date=True
-# merge_tweets_by_date=False
+merge_tweets_by_date = True
+# merge_tweets_by_date = False
 
 languages = ['en']
 # languages = ['en', 'de']
-
-# file_exists = [False]
-# file_exists = [False, False]
 
 cols_to_drop = ['tweet', 'lang']
 # cols_to_drop = ['lang']
@@ -178,7 +175,6 @@ for date_range in date_ranges:
                 df_final_data = df_data.groupby('created_at', as_index=False)['clean_tweets'].apply(' '.join)
 
                 # Write processed data to output file
-                # df_final_data.to_csv(output_file, mode='a', index=False, header=not file_exists[lang_idx])
                 df_final_data.to_csv(output_file, mode='a', index=False, header=True)
 
             else:
@@ -190,11 +186,7 @@ for date_range in date_ranges:
                 # df_data['freq_count'] = count_frequencies(df_data['clean_tweets'])
 
                 # Write processed data to output file
-                # df_data.to_csv(output_file, mode='a', index=False, header=not file_exists[lang_idx])
                 df_data.to_csv(output_file, mode='a', index=False, header=True)
 
             print(f"saved file {output_file}")
             print('Time to build file: {} mins'.format(round((time() - t) / 60, 2)))
-
-            # Set file_exists to True after writing the header once
-            # file_exists[lang_idx] = True
