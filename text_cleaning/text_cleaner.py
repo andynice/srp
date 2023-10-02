@@ -175,8 +175,9 @@ for date_range in date_ranges:
             # df_data["tokenized_tweets_n"] = df_data["tokenized_tweets"].apply(lambda n: len(n))
             # df_data["clean_tweets_n"] = df_data["clean_tweets"].apply(lambda n: len(n))
 
-            filtered_df_by_lang = df_data['lang'] == languages[lang_idx]
-            df_data["clean_tweets"] = df_data[filtered_df_by_lang]["tweet"].apply(lambda tweet: clean_text(tweet, languages[lang_idx], tokenize=False))
+            # filtered_df_by_lang = df_data['lang'] == languages[lang_idx]
+            # df_data["clean_tweets"] = df_data[filtered_df_by_lang]["tweet"].apply(lambda tweet: clean_text(tweet, languages[lang_idx], tokenize=False))
+            df_data["clean_tweets"] = df_data["tweet"].apply(lambda tweet: clean_text(tweet, languages[lang_idx], tokenize=False))
 
             output_file = f"./output/{languages[lang_idx]}_{date_str}_output.csv"
             # output_file = f"./output/{languages[lang_idx]}_output.csv"
