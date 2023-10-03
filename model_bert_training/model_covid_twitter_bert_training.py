@@ -1,6 +1,23 @@
 import pandas as pd
+import datetime
+import numpy as np
 from datasets import Dataset
 from sklearn.model_selection import train_test_split
+
+from transformers import AutoTokenizer, AutoModelForSequenceClassification, DataCollatorWithPadding
+from torch.utils.data import DataLoader
+
+# MODEL DEFINITION
+BASE_MODEL = "digitalepidemiologylab/covid-twitter-bert"
+LEARNING_RATE = 2e-5
+# MAX_LENGTH = 256
+BATCH_SIZE = 16
+EPOCHS = 20
+
+tokenizer = AutoTokenizer.from_pretrained(BASE_MODEL)
+model = AutoModelForSequenceClassification.from_pretrained(BASE_MODEL, num_labels=1)
+
+# DATA PREPARATION
 
 g_cases_filename = f"./data/g_cases_2021.csv"
 y = pd.read_csv(g_cases_filename)
@@ -17,74 +34,93 @@ for date_range in date_ranges:
 
         filename = f"./data/en_{date_str}_output.csv"
         df_data = pd.read_csv(filename)
-        print(f"df_data.shape: {df_data.shape}")
         df_data = df_data.replace(r'^\s*$', np.nan, regex=True)
         #X = total_dataframe.append(df_data, ignore_index=True)
         X = pd.concat([X, df_data], ignore_index=True)
-        print(X.isnull().sum())
 
-tweets_filename = f"./data/en_2021-01-01_output.csv"
-X = pd.read_csv(tweets_filename)
+print(f"X.shape: {X.shape}")
 
-X, X_test, y, y_test = train_test_split(X, y, test_size=0.3,train_size=0.7)
+X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.3, train_size=0.7, random_state=42, shuffle=False)
+train_df = pd.concat([X_train, y_train], axis=1)
+val_df = pd.concat([X_val, y_val], axis=1)
 
-dataset = Dataset.from_pandas(X)
+print("train_df")
+print(train_df)
+print("val_df")
+print(val_df)
 
-Dataset({
-   features: ['g_values'],
-   num_rows: 2
-})
+raw_train_ds = Dataset.from_pandas(train_df)
+raw_val_ds = Dataset.from_pandas(val_df)
 
-raw_train_ds = Dataset.from_json("data/sentiments.train.jsonlines")
-raw_val_ds = Dataset.from_json("data/sentiments.test.jsonlines")
-raw_test_ds = Dataset.from_json("data/sentiments.test.jsonlines")
+# max_length = tokenizer.model_max_length
+# print("Maximum input sequence length:", max_length)
 
-from transformers import AutoTokenizer, AutoModelForSequenceClassification, DataCollatorWithPadding
-from torch.utils.data import DataLoader
+# ds = {"train": raw_train_ds, "validation": raw_val_ds, "test": raw_test_ds}
+ds = {"train": raw_train_ds, "validation": raw_val_ds}
+print("ds")
+print(ds)
 
-BASE_MODEL = "camembert-base"
-LEARNING_RATE = 2e-5
-MAX_LENGTH = 256
-BATCH_SIZE = 16
-EPOCHS = 20
+# CALCULATE MAX_LENGTH
+# Tokenize all tweets to find the maximum tokenized length
+max_length = 0
 
-# Let's name the classes 0, 1, 2, 3, 4 like their indices
-id2label = {k:k for k in range(5)}
-label2id = {k:k for k in range(5)}
+for index, row in X.iterrows():
+    tweet = row['clean_tweets']
 
-tokenizer = AutoTokenizer.from_pretrained(BASE_MODEL)
-model = AutoModelForSequenceClassification.from_pretrained(BASE_MODEL, id2label=id2label, label2id=label2id)
+    # Tokenize the tweet
+    tokens = tokenizer(tweet, return_tensors="pt")
 
-## {'id': 457, 'text': 'Trop désagréable au téléphone 😡! ! !', 'uuid': '91c4efaaada14a1b9b050268185b6ae5', 'score': 1}
+    # Get the length of the tokenized sequence
+    length = tokens['input_ids'].shape[1]
 
-ds = {"train": raw_train_ds, "validation": raw_val_ds, "test": raw_test_ds}
+    # Update max_length if needed
+    if length > max_length:
+        max_length = length
+
+print(f"Calculated max_length: {max_length}")
 
 def preprocess_function(examples):
-    label = examples["score"] 
-    examples = tokenizer(examples["text"], truncation=True, padding="max_length", max_length=256)
-    examples["label"] = label
+    label = examples["g_values"] 
+    # examples = tokenizer(examples["clean_tweets"], truncation=True, padding="max_length", max_length=256)
+    examples = tokenizer(examples["clean_tweets"], truncation=False, padding="max_length", max_length=max_length)
+    # examples = tokenizer(examples["clean_tweets"])
+
+    examples["label"] = float(label)
+    print(examples)
     return examples
 
 for split in ds:
-    ds[split] = ds[split].map(preprocess_function, remove_columns=["id", "uuid", "text", "score"])
+    ds[split] = ds[split].map(preprocess_function, remove_columns=["date", "total_cases", "g_values", "created_at", "clean_tweets"])
+
+print("ds")
+print(ds)
 
 
-import numpy as np
-from datasets import load_metric
+from sklearn.metrics import mean_absolute_error
+from sklearn.metrics import mean_squared_error
+from sklearn.metrics import r2_score
 
-metric = load_metric("accuracy")
-
-def compute_metrics(eval_pred):
+def compute_metrics_for_regression(eval_pred):
     logits, labels = eval_pred
-    predictions = np.argmax(logits, axis=-1)
-    return metric.compute(predictions=predictions, references=labels)
+    labels = labels.reshape(-1, 1)
+    
+    mse = mean_squared_error(labels, logits)
+    mae = mean_absolute_error(labels, logits)
+    r2 = r2_score(labels, logits)
+    single_squared_errors = ((logits - labels).flatten()**2).tolist()
+    
+    # Compute accuracy 
+    # Based on the fact that the rounded score = true score only if |single_squared_errors| < 0.5
+    accuracy = sum([1 for e in single_squared_errors if e < 0.25]) / len(single_squared_errors)
+    
+    return {"mse": mse, "mae": mae, "r2": r2, "accuracy": accuracy}
 
 
 
 from transformers import TrainingArguments
 
 training_args = TrainingArguments(
-    output_dir="../models/camembert-fine-tuned-regression",
+    output_dir="./models/covid-twitter-bert-fine-tuned-regression",
     learning_rate=LEARNING_RATE,
     per_device_train_batch_size=BATCH_SIZE,
     per_device_eval_batch_size=BATCH_SIZE,
@@ -97,15 +133,42 @@ training_args = TrainingArguments(
 )
 
 
+import torch
 from transformers import Trainer
 
-trainer = Trainer(
+class RegressionTrainer(Trainer):
+    def compute_loss(self, model, inputs, return_outputs=False):
+        labels = inputs.pop("labels")
+        outputs = model(**inputs)
+        logits = outputs[0][:, 0]
+        loss = torch.nn.functional.mse_loss(logits, labels)
+        return (loss, outputs) if return_outputs else loss
+
+
+trainer = RegressionTrainer(
     model=model,
     args=training_args,
     train_dataset=ds["train"],
     eval_dataset=ds["validation"],
-    compute_metrics=compute_metrics
+    compute_metrics=compute_metrics_for_regression,
 )
 
 trainer.train()
-trainer.save_model("model_bert_classification.model")
+trainer.save_model("model_covid_twitter_bert.model")
+
+
+# from local folder
+# model = AutoModelForSequenceClassification.from_pretrained("./saved_model/")
+
+# from transformers import AutoTokenizer
+
+# tokenizer = AutoTokenizer.from_pretrained("bert-base-cased")
+
+# sequence = "mf"
+# tokens = tokenizer.tokenize(sequence)
+
+# print(tokens)
+
+# ids = tokenizer.convert_tokens_to_ids(tokens)
+
+# print(ids)

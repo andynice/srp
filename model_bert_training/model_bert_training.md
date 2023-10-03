@@ -46,26 +46,26 @@ accelerate                0.23.0             pyhd8ed1ab_0    conda-forge
 ```
 * In case we need to delete the environment
 ```
-conda remove --name clean_text --all
+conda remove --name model_bert_training --all
 ```
-# Text cleaning
+# Model BERT Training
 ## Prepare directory
-* Create a directory "text_cleaning"
+* Create a directory "model_bert_training"
 ```
-mkdir text_cleaning
+mkdir model_bert_training
 ```
-* Create a directory inside "text_cleaning" called "data"
+* Create a directory inside "model_bert_training" called "data"
 ```
-cd ./text_cleaning
+cd ./model_bert_training
 mkdir data
 ```
-* Create a directory inside "text_cleaning" called "output"
+* Create a directory inside "model_bert_training" called "output"
 ```
 mkdir output
 ```
-* Create the python script "text_cleaner.py"
+* Create the python script "model_covid_twitter_bert_training.py"
 ```
-vi text_cleaner.py
+vi model_covid_twitter_bert_training.py
 ```
 
 ## Prepare wordnet corpora from nltk, for WordNetLemmatizer
@@ -96,10 +96,8 @@ rm ./punkt.zip
 ## Run script
 * Upload input file, from local host to cluster
 ```
-scp [path]\2021-01-01.csv correa@master.ismll.de:/home/correa/text_cleaning/data
-scp [path]\2021-01-02.csv correa@master.ismll.de:/home/correa/text_cleaning/data
-
-scp correa@master.ismll.de:/home/correa/text_cleaning/output/en_output.csv [local-path]
+scp [path]\g_cases_2021.csv correa@master.ismll.de:/home/correa/model_bert_training/data
+scp [path]\en_2021-01-01_output.csv correa@master.ismll.de:/home/correa/model_bert_training/data
 ```
 * Create the bash script "test.sh"
 ```
