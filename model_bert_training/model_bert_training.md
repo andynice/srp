@@ -68,30 +68,28 @@ mkdir output
 vi model_covid_twitter_bert_training.py
 ```
 
-## Prepare wordnet corpora from nltk, for WordNetLemmatizer
+## Prepare huggingface model offline
 * Nodes are not connected to internet, so it's necessary to download first everything needed
-* Using the documentation from nltk https://www.nltk.org/data.html
-* Download the wordnet corpora (zip file) from http://www.nltk.org/nltk_data/ 
-* Link for downloading directly (https://raw.githubusercontent.com/nltk/nltk_data/gh-pages/packages/corpora/wordnet.zip)
-* Create the folder "/nltk_data/corpora" in the environment folder "/home/correa/miniconda3/envs/clean_text"
+* Otherwise, you will get an error message like this
 ```
-cd /home/correa/miniconda3/envs/clean_text
+OSError: We couldn't connect to 'https://huggingface.co' to load this file, couldn't find it in the cached files and it looks like digitalepidemiologylab/covid-twitter-bert is not the path to a directory containing a file named config.json.
+Checkout your internet connection or see how to run the library in offline mode at 'https://huggingface.co/docs/transformers/installation#offline-mode'.
+```
 
-mkdir nltk_data
-cd nltk_data
-mkdir corpora
+* Using the documentation from huggingface https://huggingface.co/docs/transformers/installation#offline-mode
+* Run the file "download_bert_model.py" in the local environment
+* Prepare a zip file of the jsut created folder "covid-twitter-bert"
+* Upload the zip file with the model to the cluster
 ```
-* Upload the zip from local host to cluster
+scp [path]\covid-twitter-bert.zip correa@master.ismll.de:/home/correa/model_bert_training
 ```
-scp [path]\wordnet.zip correa@master.ismll.de:/home/correa/miniconda3/envs/clean_text/nltk_data
+* Unzip zip file into "/home/correa/model_bert_training" folder
 ```
-* Unzip zip file into "nltk_data/tokenizers" folder
-```
-unzip ./wordnet.zip
+unzip ./covid-twitter-bert.zip
 ```
 * Delete zip file
 ```
-rm ./punkt.zip
+rm ./covid-twitter-bert.zip
 ```
 ## Run script
 * Upload input file, from local host to cluster
