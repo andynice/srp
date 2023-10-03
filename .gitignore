@@ -2,6 +2,7 @@
 **/data
 **/output
 **/models
+**/covid-twitter-bert
 *.model
 *.zip
 *.pickle

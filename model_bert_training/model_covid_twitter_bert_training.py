@@ -8,7 +8,8 @@ from transformers import AutoTokenizer, AutoModelForSequenceClassification, Data
 from torch.utils.data import DataLoader
 
 # MODEL DEFINITION
-BASE_MODEL = "digitalepidemiologylab/covid-twitter-bert"
+# BASE_MODEL = "digitalepidemiologylab/covid-twitter-bert"
+BASE_MODEL = "./covid-twitter-bert"
 LEARNING_RATE = 2e-5
 # MAX_LENGTH = 256
 BATCH_SIZE = 16
