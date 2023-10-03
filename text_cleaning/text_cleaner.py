@@ -21,7 +21,6 @@ def filter_dataframe(df_data, langs):
 
     filtered_df = df_data[df_data["lang"].isin(langs)]
 
-    #cols_to_drop = ['geo', 'id', 'source']
     cols_to_drop = ['geo', 'id', 'source', 'author id', 'like_count', 'quote_count', 'reply_count', 'retweet_count']
     filtered_df = df_data.drop(cols_to_drop, axis=1, errors="ignore")
 
@@ -53,97 +52,98 @@ def tokenize_words(text):
     tokens = [token for token in tokens if not re.match(r'\b\d+\b', token)]
     return tokens
 
-def clean_text(text, language, tokenize):
+def clean_text(text, language, tokenize, clean_tweets):
     if tokenize:
         words = []
     else:
         words = ""
     if isinstance(text, str):
 
-        # remove emojis
-        text = demoji.replace(text, repl="")
+        if clean_tweets:
+            # remove emojis
+            text = demoji.replace(text, repl="")
 
-        # remove @s
-        text = re.sub("@[A-Za-z0-9_]+", "", text)
+            # remove @s
+            text = re.sub("@[A-Za-z0-9_]+", "", text)
 
-        # remove hashtags
-        text = re.sub("#[A-Za-z0-9_]+", "", text)
+            # remove hashtags
+            text = re.sub("#[A-Za-z0-9_]+", "", text)
 
-        # remove links
-        text = re.sub('http://\S+|https://\S+', '', text)
+            # remove links
+            text = re.sub('http://\S+|https://\S+', '', text)
 
-        # remove encoded characters
-        text = re.sub('&amp;', '', text)
+            # remove encoded characters
+            text = re.sub('&amp;', '', text)
 
-        # replace '’' with '''
-        text = re.sub('[’]+', '\'', text)
+            # replace '’' with '''
+            text = re.sub('[’]+', '\'', text)
 
-        # remove special characters
-        text = re.sub('[\\\\!~•›\.=£►,*)@#%(&$_?^:;"|’“„”…‘/\+{}\[\]\-—–]+', ' ', text) # //so
+            # remove special characters
+            text = re.sub('[\\\\!~•›\.=£►,*)@#%(&$_?^:;"|’“„”…‘/\+{}\[\]\-—–]+', ' ', text) # //so
 
-        # replace '-' or '—' or '–' between any kind of space, with space
-        # text = re.sub('\s[\-—–]+\s', ' ', text) # --- -> 
+            # replace ''' between any kind of space, with space
+            text = re.sub('\s+\'+\s+', ' ', text) # ' ->
 
-        # remove '-' or '—' or '–' after or before words
-        # text = re.sub(r'(?!\b[-—–]+\b)(\b[-—–]+|[-—–]+\b)', '', text) # where-- -> where | -since -> since | gestapo-like -> gestapo like
+            # remove ''' after words
+            text = re.sub(r'\b\'+\s+|\b\'+\s+$', ' ', text) # alert' -> alert 
 
-        # replace ''' between any kind of space, with space
-        text = re.sub('\s+\'+\s+', ' ', text) # ' ->
+            # remove ''' before words
+            text = re.sub(r'^\'+\b|\s+\'+\b', ' ', text) # 'pandering -> pandering
 
-        # remove ''' after words
-        text = re.sub(r'\b\'+\s+|\b\'+\s+$', ' ', text) # alert' -> alert 
-
-        # remove ''' before words
-        text = re.sub(r'^\'+\b|\s+\'+\b', ' ', text) # 'pandering -> pandering
-
-        # remove foreign charactes
-        text = re.sub(r'[^A-Za-z\s]', '', text)
+            # remove foreign charactes
+            text = re.sub(r'[^A-Za-z\s]', '', text)
 
         # Lemmatization and remove stopwords
         if language == "en":
-            stop_words = en_stopwords
-            # remove unnecessary blank spaces
-            words = tokenize_words(text.lower())
-            words = [WordNetLemmatizer().lemmatize(word) for word in words if word not in (stop_words)]
+            if clean_tweets:
+                stop_words = en_stopwords
+                # remove unnecessary blank spaces
+                words = tokenize_words(text.lower())
+                words = [WordNetLemmatizer().lemmatize(word) for word in words if word not in (stop_words)]
+            else:
+                # remove unnecessary blank spaces
+                words = text.split()
 
         elif language == "de":
-            stop_words = de_stopwords
-            # remove unnecessary blank spaces
-            text = " ".join(text.split())
-            nlp = spacy.load('de_core_news_sm')
-            lemma_text = nlp(text)
-            words = [word.lemma_.lower() for word in lemma_text if word.lemma_ not in (stop_words) and not re.match(r'\b\d+\b', word.lemma_)]
-        
-        text = " ".join(words)
+            if clean_tweets:
+                stop_words = de_stopwords
+                # remove unnecessary blank spaces
+                text = " ".join(text.split())
+                nlp = spacy.load('de_core_news_sm')
+                lemma_text = nlp(text)
+                words = [word.lemma_.lower() for word in lemma_text if word.lemma_ not in (stop_words) and not re.match(r'\b\d+\b', word.lemma_)]
+            else:
+                # remove unnecessary blank spaces
+                words = text.split()
 
-        # remove ''' after words
-        words = re.sub(r'\b\'s', '', text) # trump's -> trump 
+        if clean_tweets:
+            text = " ".join(words)
 
-        if tokenize:
-            # words = " ".join(words)
-            words = words.split()
+            # remove ''' after words and before 's'
+            words = re.sub(r'\b\'s', '', text) # trump's -> trump
+
+            if tokenize:
+                words = words.split()
+        else:
+            if tokenize == False:
+                words = " ".join(words)
 
     return words
 
-## GENERATE FRAQUENCIES
-def count_frequencies(text):
-    return text
-
 # Output CSV file
-# date_ranges = [['2021-01-01', '2021-02-01'], ['2021-02-01', '2021-03-01']]
+date_ranges = [['2021-01-01', '2021-02-01'], ['2021-02-01', '2021-03-01']]
 
-date_ranges = [['2021-01-01', '2021-01-02']]
+# date_ranges = [['2021-01-01', '2021-01-02']]
 # date_ranges = [['2020-01-04', '2020-01-05']]
 
+clean_tweets = False
 merge_tweets_by_date = True
 # merge_tweets_by_date = False
 
 languages = ['en']
 # languages = ['en', 'de']
 
-cols_to_drop = ['tweet', 'lang']
-# cols_to_drop = ['lang']
-
+final_cols_to_drop = ['tweet', 'lang']
 
 for date_range in date_ranges:
 
@@ -165,14 +165,20 @@ for date_range in date_ranges:
             # df_data["tokenized_tweets_n"] = df_data["tokenized_tweets"].apply(lambda n: len(n))
             # df_data["clean_tweets_n"] = df_data["clean_tweets"].apply(lambda n: len(n))
 
-            df_data["clean_tweets"] = df_data["tweet"].apply(lambda tweet: clean_text(tweet, languages[lang_idx], tokenize=False))
-
-            output_file = f"./output/{languages[lang_idx]}_{date_str}_output.csv"
-            # output_file = f"./output/{languages[lang_idx]}_output.csv"
+            if clean_tweets:
+                df_data["clean_tweets"] = df_data["tweet"].apply(lambda tweet: clean_text(tweet, languages[lang_idx], tokenize=False, clean_tweets=clean_tweets))
+                output_file = f"./output/{languages[lang_idx]}_{date_str}_output.csv"
+            else:
+                df_data["tweet"] = df_data["tweet"].apply(lambda tweet: clean_text(tweet, languages[lang_idx], tokenize=False, clean_tweets=clean_tweets))
+                output_file = f"./output_unclean_tweets/{languages[lang_idx]}_{date_str}_output.csv"
+                final_cols_to_drop = ['lang']
 
             if merge_tweets_by_date:
 
-                df_final_data = df_data.groupby('created_at', as_index=False)['clean_tweets'].apply(' '.join)
+                if clean_tweets:
+                    df_final_data = df_data.groupby('created_at', as_index=False)['clean_tweets'].apply(' '.join)
+                else:
+                    df_final_data = df_data.groupby('created_at', as_index=False)['tweet'].apply(' '.join)
 
                 # Write processed data to output file
                 df_final_data.to_csv(output_file, mode='a', index=False, header=True)
@@ -180,10 +186,7 @@ for date_range in date_ranges:
             else:
 
                 # Drop columns
-                df_data = df_data.drop(cols_to_drop, axis=1)
-
-                # Count Frequencies
-                # df_data['freq_count'] = count_frequencies(df_data['clean_tweets'])
+                df_data = df_data.drop(final_cols_to_drop, axis=1)
 
                 # Write processed data to output file
                 df_data.to_csv(output_file, mode='a', index=False, header=True)

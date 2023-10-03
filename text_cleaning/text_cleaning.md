@@ -61,6 +61,10 @@ mkdir data
 ```
 mkdir output
 ```
+* Create a directory inside "text_cleaning" called "output_unclean_tweets"
+```
+mkdir output_unclean_tweets
+```
 * Create the python script "text_cleaner.py"
 ```
 vi text_cleaner.py
