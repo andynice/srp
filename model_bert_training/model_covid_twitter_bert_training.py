@@ -7,6 +7,8 @@ from sklearn.model_selection import train_test_split
 from transformers import AutoTokenizer, AutoModelForSequenceClassification, DataCollatorWithPadding
 from torch.utils.data import DataLoader
 
+from time import time
+
 # MODEL DEFINITION
 # BASE_MODEL = "digitalepidemiologylab/covid-twitter-bert"
 BASE_MODEL = "./covid-twitter-bert"
@@ -24,7 +26,7 @@ g_cases_filename = f"./data/g_cases_2021.csv"
 y = pd.read_csv(g_cases_filename)
 
 X = pd.DataFrame()
-date_ranges = [['2021-01-01', '2021-01-04']]
+date_ranges = [['2021-01-01', '2021-01-11']]
 for date_range in date_ranges:
     start = datetime.datetime.strptime(date_range[0], "%Y-%m-%d")
     end = datetime.datetime.strptime(date_range[1], "%Y-%m-%d")
@@ -41,28 +43,47 @@ for date_range in date_ranges:
 
 print(f"X.shape: {X.shape}")
 
-X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.3, train_size=0.7, random_state=42, shuffle=False)
+train_ratio = 0.70
+validation_ratio = 0.15
+test_ratio = 0.15
+
+# train is now 70% of the entire data set, test size 30%
+X_train, X_test, y_train, y_test = train_test_split(X, y, train_size=train_ratio, random_state=42, shuffle=False)
+#X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.3, train_size=0.7, random_state=42, shuffle=False)
+
+# test is now 15% of the initial data set
+# validation is now 15% of the initial data set
+X_val, X_test, y_val, y_test = train_test_split(X_test, y_test, test_size=test_ratio/(test_ratio + validation_ratio))
 train_df = pd.concat([X_train, y_train], axis=1)
 val_df = pd.concat([X_val, y_val], axis=1)
+test_df = pd.concat([X_test, y_test], axis=1)
 
 print("train_df")
+print(f"train_df.shape: {train_df.shape}")
 print(train_df)
+
 print("val_df")
+print(f"val_df.shape: {val_df.shape}")
 print(val_df)
+
+print("test_df")
+print(f"test_df.shape: {test_df.shape}")
+print(test_df)
 
 raw_train_ds = Dataset.from_pandas(train_df)
 raw_val_ds = Dataset.from_pandas(val_df)
+raw_test_ds = Dataset.from_pandas(test_df)
 
 # max_length = tokenizer.model_max_length
 # print("Maximum input sequence length:", max_length)
 
-# ds = {"train": raw_train_ds, "validation": raw_val_ds, "test": raw_test_ds}
-ds = {"train": raw_train_ds, "validation": raw_val_ds}
+ds = {"train": raw_train_ds, "validation": raw_val_ds, "test": raw_test_ds}
+
 print("ds")
 print(ds)
 
-# CALCULATE MAX_LENGTH
-# Tokenize all tweets to find the maximum tokenized length
+CALCULATE MAX_LENGTH
+Tokenize all tweets to find the maximum tokenized length
 max_length = 0
 
 for index, row in X.iterrows():
@@ -154,9 +175,16 @@ trainer = RegressionTrainer(
     compute_metrics=compute_metrics_for_regression,
 )
 
+t = time()
+
 trainer.train()
 trainer.save_model("model_covid_twitter_bert.model")
 
+print('Time to train model: {} mins'.format(round((time() - t) / 60, 2)))
+
+## EVALUATION
+trainer.eval_dataset=ds["test"]
+trainer.evaluate()
 
 # from local folder
 # model = AutoModelForSequenceClassification.from_pretrained("./saved_model/")
