@@ -130,3 +130,9 @@ total 61536
   8.11976613e-04 -2.09953310e-03  2.98258266e-03 -1.04414101e-03]
 (300,)
 ```
+
+
+
+## References
+* https://huggingface.co/learn/nlp-course/chapter3/3?fw=pt
+* https://lajavaness.medium.com/regression-with-text-input-using-bert-and-transformers-71c155034b13
