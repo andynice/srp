@@ -39,6 +39,7 @@ en_stopwords = ["able","about","above","abroad","according","accordingly","acros
 # research word is part of non-stop words in english
 en_stopwords.remove("research")
 # add words
+en_stopwords.append("dont")
 en_stopwords.append("would've")
 en_stopwords.append("wouldve")
 en_stopwords.append("y'all")
@@ -131,12 +132,12 @@ def clean_text(text, language, tokenize, clean_tweets):
     return words
 
 # Output CSV file
-date_ranges = [['2021-01-01', '2021-02-01'], ['2021-02-01', '2021-03-01']]
+date_ranges = [['2021-01-01', '2021-02-01'], ['2021-02-01', '2021-03-01'], ['2021-03-01', '2021-04-01']]
 
 # date_ranges = [['2021-01-01', '2021-01-02']]
 # date_ranges = [['2020-01-04', '2020-01-05']]
 
-clean_tweets = False
+clean_tweets = True
 merge_tweets_by_date = True
 # merge_tweets_by_date = False
 
