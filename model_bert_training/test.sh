@@ -7,4 +7,4 @@
 #SBATCH --gres=gpu:2
 
 echo "Before running model_covid_twitter_bert_training.py"
-srun /home/correa/miniconda3/envs/model_bert_training/bin/python model_covid_twitter_bert_training.py        # python jobs require the srun command to work
+srun /home/correa/miniconda3/envs/model_bert_training/bin/python model_covid_twitter_bert_training.py --train True       # python jobs require the srun command to work
