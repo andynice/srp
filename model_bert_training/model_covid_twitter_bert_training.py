@@ -1,3 +1,19 @@
+import sys, getopt
+
+arguments = sys.argv[1:]
+short_options = "t:"
+long_options = ["train="]
+
+options, values = getopt.getopt(arguments, short_options, long_options)
+
+for o, v in options:
+    print(f"Option is {o}. Value is {v}.")
+    if o == "-t" or o == "--train":
+        if v == "True":
+            train_arg = True
+        else:
+            train_arg = False
+
 import pandas as pd
 import datetime
 import numpy as np
@@ -9,13 +25,20 @@ from torch.utils.data import DataLoader
 
 from time import time
 
+# TRAIN OR EVAL
+train = train_arg
+trained_model_name = "model_covid_twitter_bert.model"
+
 # MODEL DEFINITION
-# BASE_MODEL = "digitalepidemiologylab/covid-twitter-bert"
-BASE_MODEL = "./covid-twitter-bert"
+if train:
+    # BASE_MODEL = "digitalepidemiologylab/covid-twitter-bert"
+    BASE_MODEL = "./covid-twitter-bert"
+else:
+    BASE_MODEL = "./" + trained_model_name
 LEARNING_RATE = 2e-5
 # MAX_LENGTH = 256
 BATCH_SIZE = 16
-EPOCHS = 20
+EPOCHS = 3
 
 tokenizer = AutoTokenizer.from_pretrained(BASE_MODEL)
 model = AutoModelForSequenceClassification.from_pretrained(BASE_MODEL, num_labels=1)
@@ -53,7 +76,7 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, train_size=train_ratio
 
 # test is now 15% of the initial data set
 # validation is now 15% of the initial data set
-X_val, X_test, y_val, y_test = train_test_split(X_test, y_test, test_size=test_ratio/(test_ratio + validation_ratio))
+X_val, X_test, y_val, y_test = train_test_split(X_test, y_test, test_size=test_ratio/(test_ratio + validation_ratio), random_state=42, shuffle=False)
 train_df = pd.concat([X_train, y_train], axis=1)
 val_df = pd.concat([X_val, y_val], axis=1)
 test_df = pd.concat([X_test, y_test], axis=1)
@@ -82,8 +105,8 @@ ds = {"train": raw_train_ds, "validation": raw_val_ds, "test": raw_test_ds}
 print("ds")
 print(ds)
 
-CALCULATE MAX_LENGTH
-Tokenize all tweets to find the maximum tokenized length
+# CALCULATE MAX_LENGTH
+# Tokenize all tweets to find the maximum tokenized length
 max_length = 0
 
 for index, row in X.iterrows():
@@ -108,7 +131,7 @@ def preprocess_function(examples):
     # examples = tokenizer(examples["clean_tweets"])
 
     examples["label"] = float(label)
-    print(examples)
+    # print(examples)
     return examples
 
 for split in ds:
@@ -175,16 +198,26 @@ trainer = RegressionTrainer(
     compute_metrics=compute_metrics_for_regression,
 )
 
-t = time()
 
-trainer.train()
-trainer.save_model("model_covid_twitter_bert.model")
+if train:
+    ## TRAINING
+    t = time()
 
-print('Time to train model: {} mins'.format(round((time() - t) / 60, 2)))
+    trainer.train()
+    trainer.save_model(trained_model_name)
+    tokenizer.save_pretrained(trained_model_name)
 
-## EVALUATION
-trainer.eval_dataset=ds["test"]
-trainer.evaluate()
+    print('Time to train model: {} mins'.format(round((time() - t) / 60, 2)))
+
+else:
+    ## EVALUATION
+    t = time()
+    
+    trainer.eval_dataset=ds["test"]
+    metrics = trainer.evaluate()
+    print(metrics)
+
+    print('Time to eval model: {} mins'.format(round((time() - t) / 60, 2)))
 
 # from local folder
 # model = AutoModelForSequenceClassification.from_pretrained("./saved_model/")
