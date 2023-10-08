@@ -68,29 +68,16 @@ mkdir output
 vi model_covid_twitter_bert_training.py
 ```
 
-## Prepare huggingface model offline
-* Nodes are not connected to internet, so it's necessary to download first everything needed
-* Otherwise, you will get an error message like this
+## Arguments
+When running the script you can send some command line arguments
+### train
+* Value: False or True
+* name: -t or --train
 ```
-OSError: We couldn't connect to 'https://huggingface.co' to load this file, couldn't find it in the cached files and it looks like digitalepidemiologylab/covid-twitter-bert is not the path to a directory containing a file named config.json.
-Checkout your internet connection or see how to run the library in offline mode at 'https://huggingface.co/docs/transformers/installation#offline-mode'.
+model_covid_twitter_bert_training.py -t False
+model_covid_twitter_bert_training.py --train True
 ```
 
-* Using the documentation from huggingface https://huggingface.co/docs/transformers/installation#offline-mode
-* Run the file "download_bert_model.py" in the local environment
-* Prepare a zip file of the jsut created folder "covid-twitter-bert"
-* Upload the zip file with the model to the cluster
-```
-scp [path]\covid-twitter-bert.zip correa@master.ismll.de:/home/correa/model_bert_training
-```
-* Unzip zip file into "/home/correa/model_bert_training" folder
-```
-unzip ./covid-twitter-bert.zip
-```
-* Delete zip file
-```
-rm ./covid-twitter-bert.zip
-```
 ## Run script
 * Upload input file, from local host to cluster
 ```
