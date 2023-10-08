@@ -7,4 +7,4 @@
 #SBATCH --gres=gpu:2
 
 echo "Before running text_cleaner.py"
-srun /home/correa/miniconda3/envs/text_cleaning/bin/python text_cleaner.py        # python jobs require the srun command to work
+srun /home/correa/miniconda3/envs/text_cleaning/bin/python text_cleaner.py --clean False --merge True --startDate 2021-01-01 --endDate 2021-01-02        # python jobs require the srun command to work

@@ -1,3 +1,29 @@
+import sys, getopt
+
+arguments = sys.argv[1:]
+short_options = "c:m:s:e"
+long_options = ["clean=", "merge=", "startDate=", "endDate="]
+
+options, values = getopt.getopt(arguments, short_options, long_options)
+
+for o, v in options:
+    print(f"Option is {o}. Value is {v}.")
+    if o == "-c" or o == "--clean":
+        if v == "True":
+            clean_arg = True
+        else:
+            clean_arg = False
+    if o == "-m" or o == "--merge":
+        if v == "True":
+            merge_arg = True
+        else:
+            merge_arg = False
+    if o == "-s" or o == "--startDate":
+        startDate = v
+    if o == "-e" or o == "--endDate":
+        endDate = v
+
+
 import pandas as pd
 import re
 import demoji
@@ -132,14 +158,11 @@ def clean_text(text, language, tokenize, clean_tweets):
     return words
 
 # Output CSV file
-date_ranges = [['2021-01-01', '2021-02-01'], ['2021-02-01', '2021-03-01'], ['2021-03-01', '2021-04-01']]
-
+# date_ranges = [['2021-01-01', '2021-02-01'], ['2021-02-01', '2021-03-01'], ['2021-03-01', '2021-04-01']]
 # date_ranges = [['2021-01-01', '2021-01-02']]
-# date_ranges = [['2020-01-04', '2020-01-05']]
-
-clean_tweets = True
-merge_tweets_by_date = True
-# merge_tweets_by_date = False
+date_ranges = [[startDate, endDate]]
+clean_tweets = clean_arg
+merge_tweets_by_date = merge_arg
 
 languages = ['en']
 # languages = ['en', 'de']

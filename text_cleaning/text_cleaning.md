@@ -70,6 +70,25 @@ mkdir output_unclean_tweets
 vi text_cleaner.py
 ```
 
+## Arguments
+When running the script you can send some command line arguments
+### clean
+* Value: False or True
+* name: -c or --clean
+### merge
+* Value: False or True
+* name: -m or --merge
+### start date
+* Value: 2021-12-24
+* name: -s or --startDate
+### merge (not included)
+* Value: 2021-12-25
+* name: -e or --endDate
+```
+text_cleaner.py -c False -m False -s 2021-01-29 -e 2021-02-04
+text_cleaner.py --clean True --merge False --startDate 2021-01-29 --endDate 2021-02-04
+```
+
 ## Prepare wordnet corpora from nltk, for WordNetLemmatizer
 * Nodes are not connected to internet, so it's necessary to download first everything needed
 * Using the documentation from nltk https://www.nltk.org/data.html
