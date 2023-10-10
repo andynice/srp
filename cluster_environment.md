@@ -1,8 +1,12 @@
 # Cluster environment preparation
 ## connect to cluster
-using the credentials provided by email
-ssh correa@master.ismll.de
+* In order to connect to the cluster by SHH you need
+    * to be connected to the University's VPN. You can find more info here https://www.uni-hildesheim.de/rz/uni-vpn/
+    * you need username and password. Those are not included for security purposes, but you can contact the team to ask for them They were provided by email:
 
+```
+ssh correa@master.ismll.de
+```
 
 ## install miniconda
 * Check OS in cluster
@@ -18,7 +22,7 @@ NAME="Ubuntu"
 * As a reference it was used too https://docs.conda.io/projects/conda/en/latest/user-guide/install/linux.html
 * After running the init script, this is how ./-bashrc looks like
 ```
-cat ./-bashrc
+cat ./.bashrc
 ...
 # >>> conda initialize >>>
 # !! Contents within this block are managed by 'conda init' !!
