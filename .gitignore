@@ -1,6 +1,7 @@
 **/.idea
 **/data
 **/*.csv
+**/*.png
 **/models
 **/covid-twitter-bert
 *.model
