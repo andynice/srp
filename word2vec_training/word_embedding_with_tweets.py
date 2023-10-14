@@ -22,7 +22,7 @@ print('starting execution')
 
 #************************************************************************************************
 total_dataframe = pd.DataFrame()
-date_ranges = [['2021-01-01', '2021-02-01'], ['2021-02-01', '2021-03-01']]
+date_ranges = [['2021-01-01', '2021-02-01'], ['2021-02-01', '2021-03-01'], ['2021-03-01', '2021-04-01']]
 for date_range in date_ranges:
     start = datetime.datetime.strptime(date_range[0], "%Y-%m-%d")
     end = datetime.datetime.strptime(date_range[1], "%Y-%m-%d")
