@@ -142,12 +142,14 @@ def preprocess_function(examples):
     
     # examples = tokenizer(examples["clean_tweets"])
 
-    examples["label"] = float(label)
+    # examples["label"] = float(label)
+    examples["label"] = [float(i) for i in label]
     print(examples)
     return examples
 
 for split in ds:
-    ds[split] = ds[split].map(preprocess_function, remove_columns=["date", "total_cases", "g_values", "created_at", "clean_tweets"])
+    # ds[split] = ds[split].map(preprocess_function, remove_columns=["date", "total_cases", "g_values", "created_at", "clean_tweets"])
+    ds[split] = ds[split].map(preprocess_function, remove_columns=["date", "total_cases", "g_values", "created_at", "clean_tweets"], batched=True)
 
 print("ds")
 print(ds)
@@ -215,9 +217,9 @@ if train:
     ## TRAINING
     t = time()
 
-    trainer.train()
-    trainer.save_model(trained_model_name)
-    tokenizer.save_pretrained(trained_model_name)
+    # trainer.train()
+    # trainer.save_model(trained_model_name)
+    # tokenizer.save_pretrained(trained_model_name)
 
     print('Time to train model: {} mins'.format(round((time() - t) / 60, 2)))
 
