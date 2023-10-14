@@ -3,7 +3,7 @@
 **/*.csv
 **/*.png
 **/models
-**/covid-twitter-bert
+**/covid-twitter-bert*
 *.model
 *.zip
 *.pickle
