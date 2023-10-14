@@ -84,11 +84,11 @@ scp [path]\covid-twitter-bert-v2.zip correa@master.ismll.de:/home/correa/model_b
 ```
 * Unzip zip file into "/home/correa/model_bert_training" folder
 ```
-unzip ./covid-twitter-bert.zip
+unzip ./covid-twitter-bert-v2.zip
 ```
 * Delete zip file
 ```
-rm ./covid-twitter-bert.zip
+rm ./covid-twitter-bert-v2.zip
 ```
 
 ## Arguments
