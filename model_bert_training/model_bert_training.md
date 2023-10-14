@@ -68,6 +68,29 @@ mkdir output
 vi model_covid_twitter_bert_training.py
 ```
 
+## Prepare huggingface model offline
+* Nodes are not connected to internet, so it's necessary to download first everything needed
+* Otherwise, you will get an error message like this
+```
+OSError: We couldn't connect to 'https://huggingface.co' to load this file, couldn't find it in the cached files and it looks like digitalepidemiologylab/covid-twitter-bert is not the path to a directory containing a file named config.json.
+Checkout your internet connection or see how to run the library in offline mode at 'https://huggingface.co/docs/transformers/installation#offline-mode'.
+```
+* Using the documentation from huggingface https://huggingface.co/docs/transformers/installation#offline-mode
+* Run the file "download_bert_model.py" in the local environment
+* Prepare a zip file of the just created folder "covid-twitter-bert-v2"
+* Upload the zip file with the model to the cluster
+```
+scp [path]\covid-twitter-bert-v2.zip correa@master.ismll.de:/home/correa/model_bert_training
+```
+* Unzip zip file into "/home/correa/model_bert_training" folder
+```
+unzip ./covid-twitter-bert.zip
+```
+* Delete zip file
+```
+rm ./covid-twitter-bert.zip
+```
+
 ## Arguments
 When running the script you can send some command line arguments
 ### train
@@ -100,25 +123,52 @@ squeue -u correa
 JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
 449092      STUD     test   correa  R       1:04      1 stud-000
 ```
-* Once the job is finished the folder will include "word2vec.model" and err and log files
+* Once the job is finished the folder will include "model_covid_twitter_bert.model" and "models" folders and err and log files
 ```
-(base) correa@master:~/word2vec_training$ ls -ltr
-total 61536
--rw-r--r-- 1 correa students 30880165 Jul 11 16:40 biorxiv_medrxiv.pickle
--rw-r--r-- 1 correa students     4240 Jul 11 16:56 word_embedding.py
--rw-r--r-- 1 correa students      344 Jul 11 17:19 test.sh
--rw-r--r-- 1 correa students      368 Jul 14 12:51 test449092.err
--rw-r--r-- 1 correa students 32102994 Jul 14 12:52 word2vec.model
--rw-r--r-- 1 correa students     5286 Jul 14 12:52 test449092.log
-```
-* The log file will include the result of the generated vector with 300 dimensions
-```
-...
-  8.11976613e-04 -2.09953310e-03  2.98258266e-03 -1.04414101e-03]
-(300,)
-```
+(base) correa@master:~/model_bert_training/models/covid-twitter-bert-fine-tuned-regression$ ls -ltr
+total 80
+drwxr-xr-x 2 correa students 4096 Oct  3 14:00 checkpoint-1
+drwxr-xr-x 2 correa students 4096 Oct  3 14:01 checkpoint-2
+drwxr-xr-x 2 correa students 4096 Oct  3 14:02 checkpoint-3
+drwxr-xr-x 2 correa students 4096 Oct  3 14:02 checkpoint-4
+drwxr-xr-x 2 correa students 4096 Oct  3 14:03 checkpoint-5
+drwxr-xr-x 2 correa students 4096 Oct  3 14:04 checkpoint-6
+drwxr-xr-x 2 correa students 4096 Oct  3 14:04 checkpoint-7
+drwxr-xr-x 2 correa students 4096 Oct  3 14:05 checkpoint-8
+drwxr-xr-x 2 correa students 4096 Oct  3 14:06 checkpoint-9
+drwxr-xr-x 2 correa students 4096 Oct  3 14:06 checkpoint-10
+drwxr-xr-x 2 correa students 4096 Oct  3 14:07 checkpoint-11
+drwxr-xr-x 2 correa students 4096 Oct  3 14:08 checkpoint-12
+drwxr-xr-x 2 correa students 4096 Oct  3 14:08 checkpoint-13
+drwxr-xr-x 2 correa students 4096 Oct  3 14:09 checkpoint-14
+drwxr-xr-x 2 correa students 4096 Oct  3 14:10 checkpoint-15
+drwxr-xr-x 2 correa students 4096 Oct  3 14:10 checkpoint-16
+drwxr-xr-x 2 correa students 4096 Oct  3 14:11 checkpoint-17
+drwxr-xr-x 2 correa students 4096 Oct  3 14:12 checkpoint-18
+drwxr-xr-x 2 correa students 4096 Oct  3 14:12 checkpoint-19
+drwxr-xr-x 2 correa students 4096 Oct  3 14:13 checkpoint-20
 
-
+(base) correa@master:~/model_bert_training/models/covid-twitter-bert-fine-tuned-regression/checkpoint-1$ ls -ltr
+total 3927936
+-rw-r--r-- 1 correa students        760 Oct  6 14:23 config.json
+-rw-r--r-- 1 correa students 1340700593 Oct  6 14:23 pytorch_model.bin
+-rw-r--r-- 1 correa students       4091 Oct  6 14:23 training_args.bin
+-rw-r--r-- 1 correa students 2681460792 Oct  6 14:24 optimizer.pt
+-rw-r--r-- 1 correa students        783 Oct  6 14:24 trainer_state.json
+-rw-r--r-- 1 correa students        627 Oct  6 14:24 scheduler.pt
+-rw-r--r-- 1 correa students      13553 Oct  6 14:24 rng_state.pth
+```
+```
+(base) correa@master:~/model_bert_training/model_covid_twitter_bert.model$ ls -ltr
+total 1310224
+-rw-r--r-- 1 correa students        760 Oct  6 14:25 config.json
+-rw-r--r-- 1 correa students 1340700593 Oct  6 14:25 pytorch_model.bin
+-rw-r--r-- 1 correa students       4091 Oct  6 14:25 training_args.bin
+-rw-r--r-- 1 correa students        394 Oct  6 14:25 tokenizer_config.json
+-rw-r--r-- 1 correa students        125 Oct  6 14:25 special_tokens_map.json
+-rw-r--r-- 1 correa students     231508 Oct  6 14:25 vocab.txt
+-rw-r--r-- 1 correa students     711562 Oct  6 14:25 tokenizer.json
+```
 
 ## References
 * https://huggingface.co/learn/nlp-course/chapter3/3?fw=pt
