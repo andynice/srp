@@ -7,7 +7,7 @@ long_options = ["train="]
 options, values = getopt.getopt(arguments, short_options, long_options)
 
 for o, v in options:
-    print(f"Option is {o}. Value is {v}.")
+    print(f"Option is {o}. Value for 'train' is {v}.")
     if o == "-t" or o == "--train":
         if v == "True":
             train_arg = True
@@ -27,18 +27,21 @@ from time import time
 
 # TRAIN OR EVAL
 train = train_arg
-trained_model_name = "model_covid_twitter_bert.model"
+trained_model_name = "model_covid_twitter_bert_v2.model"
 
 # MODEL DEFINITION
 if train:
     # BASE_MODEL = "digitalepidemiologylab/covid-twitter-bert"
-    BASE_MODEL = "./covid-twitter-bert"
+    # BASE_MODEL = "./covid-twitter-bert"
+    # BASE_MODEL = "digitalepidemiologylab/covid-twitter-bert-v2"
+    BASE_MODEL = "./covid-twitter-bert-v2"
 else:
     BASE_MODEL = "./" + trained_model_name
 LEARNING_RATE = 2e-5
 # MAX_LENGTH = 256
-BATCH_SIZE = 16
-EPOCHS = 3
+# BATCH_SIZE = 16
+BATCH_SIZE = 8
+EPOCHS = 20
 
 tokenizer = AutoTokenizer.from_pretrained(BASE_MODEL)
 model = AutoModelForSequenceClassification.from_pretrained(BASE_MODEL, num_labels=1)
@@ -49,7 +52,8 @@ g_cases_filename = f"./data/g_cases_2021.csv"
 y = pd.read_csv(g_cases_filename)
 
 X = pd.DataFrame()
-date_ranges = [['2021-01-01', '2021-01-11']]
+date_ranges = [['2021-01-01', '2021-04-01']]
+# date_ranges = [['2020-01-01', '2020-01-12']]
 for date_range in date_ranges:
     start = datetime.datetime.strptime(date_range[0], "%Y-%m-%d")
     end = datetime.datetime.strptime(date_range[1], "%Y-%m-%d")
@@ -97,8 +101,9 @@ raw_train_ds = Dataset.from_pandas(train_df)
 raw_val_ds = Dataset.from_pandas(val_df)
 raw_test_ds = Dataset.from_pandas(test_df)
 
-# max_length = tokenizer.model_max_length
-# print("Maximum input sequence length:", max_length)
+max_length = tokenizer.model_max_length
+print("Maximum input sequence length:", max_length)
+# Maximum input sequence length: 1000000000000000019884624838656
 
 ds = {"train": raw_train_ds, "validation": raw_val_ds, "test": raw_test_ds}
 
@@ -107,31 +112,38 @@ print(ds)
 
 # CALCULATE MAX_LENGTH
 # Tokenize all tweets to find the maximum tokenized length
-max_length = 0
+# max_length = 0
 
-for index, row in X.iterrows():
-    tweet = row['clean_tweets']
+# for index, row in X.iterrows():
+#     tweet = row['clean_tweets']
 
-    # Tokenize the tweet
-    tokens = tokenizer(tweet, return_tensors="pt")
+#     # Tokenize the tweet
+#     tokens = tokenizer(tweet, return_tensors="pt")
 
-    # Get the length of the tokenized sequence
-    length = tokens['input_ids'].shape[1]
+#     # Get the length of the tokenized sequence
+#     length = tokens['input_ids'].shape[1]
+#     print(f"current length: {length}")
 
-    # Update max_length if needed
-    if length > max_length:
-        max_length = length
+#     # Update max_length if needed
+#     if length > max_length:
+#         max_length = length
 
-print(f"Calculated max_length: {max_length}")
+# print(f"Calculated max_length: {max_length}")
+# Model's max length
+max_length = 512
+# RuntimeError: The size of tensor a (600) must match the size of tensor b (512) at non-singleton dimension 1
 
 def preprocess_function(examples):
     label = examples["g_values"] 
     # examples = tokenizer(examples["clean_tweets"], truncation=True, padding="max_length", max_length=256)
-    examples = tokenizer(examples["clean_tweets"], truncation=False, padding="max_length", max_length=max_length)
+    # examples = tokenizer(examples["clean_tweets"], truncation=False, padding=True, return_tensors="pt")
+    examples = tokenizer(examples["clean_tweets"], truncation=True, padding="max_length", max_length=max_length)
+    # examples = tokenizer(examples["clean_tweets"], truncation=True, padding="max_length")
+    
     # examples = tokenizer(examples["clean_tweets"])
 
     examples["label"] = float(label)
-    # print(examples)
+    print(examples)
     return examples
 
 for split in ds:
@@ -165,7 +177,7 @@ def compute_metrics_for_regression(eval_pred):
 from transformers import TrainingArguments
 
 training_args = TrainingArguments(
-    output_dir="./models/covid-twitter-bert-fine-tuned-regression",
+    output_dir="./models/covid-twitter-bert-v2-fine-tuned-regression",
     learning_rate=LEARNING_RATE,
     per_device_train_batch_size=BATCH_SIZE,
     per_device_eval_batch_size=BATCH_SIZE,
@@ -219,18 +231,18 @@ else:
 
     print('Time to eval model: {} mins'.format(round((time() - t) / 60, 2)))
 
-# from local folder
-# model = AutoModelForSequenceClassification.from_pretrained("./saved_model/")
+# # from local folder
+# # model = AutoModelForSequenceClassification.from_pretrained("./saved_model/")
 
-# from transformers import AutoTokenizer
+# # from transformers import AutoTokenizer
 
-# tokenizer = AutoTokenizer.from_pretrained("bert-base-cased")
+# # tokenizer = AutoTokenizer.from_pretrained("bert-base-cased")
 
-# sequence = "mf"
-# tokens = tokenizer.tokenize(sequence)
+# # sequence = "mf"
+# # tokens = tokenizer.tokenize(sequence)
 
-# print(tokens)
+# # print(tokens)
 
-# ids = tokenizer.convert_tokens_to_ids(tokens)
+# # ids = tokenizer.convert_tokens_to_ids(tokens)
 
-# print(ids)
+# # print(ids)
