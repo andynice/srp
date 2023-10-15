@@ -18,16 +18,17 @@ word2vec                 /home/correa/miniconda3/envs/model_bert_training
 * From the base environment, install the following packages in the "model_bert_training" environment
   * huggingface transformers
   * pytorch
-  * nltk
-  * spacy
+  * cuda
+  * numpy
+  * pandas
+  * scikit-learn
 ```
 conda install -n model_bert_training -c huggingface transformers
-conda install -n model_bert_training -c huggingface -c conda-forge datasets
-conda install -n model_bert_training pytorch torchvision -c pytorch
+conda install -n model_bert_training pytorch==2.0.1 torchvision==0.15.2 torchaudio==2.0.2 pytorch-cuda=11.7 -c pytorch -c nvidia
 conda install -n model_bert_training numpy
 conda install -n model_bert_training scikit-learn
-conda install -n model_bert_training -c conda-forge accelerate
 conda install -n model_bert_training pandas
+conda install -n model_bert_training -c conda-forge accelerate
 ```
 * To check the version installed for each library we can activate the environment "model_bert_training" and run the command * to list the installed libraries
 ```
@@ -40,6 +41,7 @@ transformers              4.32.1          py310haa95532_0
 pytorch                   2.0.1              py3.10_cpu_0    pytorch
 pytorch-mutex             1.0                         cpu    pytorch
 torchvision               0.15.2                py310_cpu    pytorch
+pytorch-cuda              11.7                 h16d0643_5    pytorch
 numpy                     1.25.2          py310h055cbcc_0
 scikit-learn              1.3.0           py310h4ed8f06_0
 accelerate                0.23.0             pyhd8ed1ab_0    conda-forge
