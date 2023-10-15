@@ -14,6 +14,7 @@ for o, v in options:
         else:
             train_arg = False
 
+import torch
 import pandas as pd
 import datetime
 import numpy as np
@@ -40,11 +41,13 @@ else:
 LEARNING_RATE = 2e-5
 # MAX_LENGTH = 256
 # BATCH_SIZE = 16
-BATCH_SIZE = 8
+BATCH_SIZE = 4
 EPOCHS = 20
 
 tokenizer = AutoTokenizer.from_pretrained(BASE_MODEL)
 model = AutoModelForSequenceClassification.from_pretrained(BASE_MODEL, num_labels=1)
+device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
+model.to(device)
 
 # DATA PREPARATION
 
@@ -142,14 +145,14 @@ def preprocess_function(examples):
     
     # examples = tokenizer(examples["clean_tweets"])
 
-    # examples["label"] = float(label)
-    examples["label"] = [float(i) for i in label]
-    print(examples)
+    examples["label"] = float(label)
+    # examples["label"] = [float(i) for i in label]
+    # print(examples)
     return examples
 
 for split in ds:
-    # ds[split] = ds[split].map(preprocess_function, remove_columns=["date", "total_cases", "g_values", "created_at", "clean_tweets"])
-    ds[split] = ds[split].map(preprocess_function, remove_columns=["date", "total_cases", "g_values", "created_at", "clean_tweets"], batched=True)
+    ds[split] = ds[split].map(preprocess_function, remove_columns=["date", "total_cases", "g_values", "created_at", "clean_tweets"])
+    # ds[split] = ds[split].map(preprocess_function, remove_columns=["date", "total_cases", "g_values", "created_at", "clean_tweets"], batched=True)
 
 print("ds")
 print(ds)
@@ -217,9 +220,9 @@ if train:
     ## TRAINING
     t = time()
 
-    # trainer.train()
-    # trainer.save_model(trained_model_name)
-    # tokenizer.save_pretrained(trained_model_name)
+    trainer.train()
+    trainer.save_model(trained_model_name)
+    tokenizer.save_pretrained(trained_model_name)
 
     print('Time to train model: {} mins'.format(round((time() - t) / 60, 2)))
 
@@ -233,18 +236,46 @@ else:
 
     print('Time to eval model: {} mins'.format(round((time() - t) / 60, 2)))
 
-# # from local folder
-# # model = AutoModelForSequenceClassification.from_pretrained("./saved_model/")
+# from local folder
+# model = AutoModelForSequenceClassification.from_pretrained("./saved_model/")
 
-# # from transformers import AutoTokenizer
+# from transformers import AutoTokenizer
 
-# # tokenizer = AutoTokenizer.from_pretrained("bert-base-cased")
+# tokenizer = AutoTokenizer.from_pretrained("bert-base-cased")
 
-# # sequence = "mf"
-# # tokens = tokenizer.tokenize(sequence)
+# sequence = "mf"
+# tokens = tokenizer.tokenize(sequence)
 
-# # print(tokens)
+# print(tokens)
 
-# # ids = tokenizer.convert_tokens_to_ids(tokens)
+# ids = tokenizer.convert_tokens_to_ids(tokens)
 
-# # print(ids)
+# print(ids)
+
+# import torch
+# print(torch.cuda.is_available())
+# torch.zeros(1).cuda()
+# device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
+# model.to(device)
+# print(device)
+
+
+
+# import torch
+
+# print(torch.cuda.is_available())
+
+# print(torch.cuda.device_count())
+
+# print(torch.cuda.current_device())
+
+# print(torch.cuda.device(0))
+
+# print(torch.cuda.get_device_name(0))
+
+# Before running model_covid_twitter_bert_training.py
+# True
+# 1
+# 0
+# <torch.cuda.device object at 0x7f3f7bfb5de0>
+# NVIDIA GeForce RTX 2070 SUPER
