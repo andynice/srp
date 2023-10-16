@@ -4,6 +4,7 @@
 **/*.png
 **/models
 **/covid-twitter-bert*
+**/longformer-base-4096
 *.model
 *.zip
 *.pickle
