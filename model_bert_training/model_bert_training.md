@@ -1,7 +1,7 @@
-# Cluster environment for text cleaning
+# Cluster environment for bert model training
 
 ## create an environment
-* Create a new environment "clean_text" with python 3.10
+* Create a new environment "model_bert_training" with python 3.10
 ```
 (base) correa@master:~$ conda create -n model_bert_training python=3.10.11
 ```
@@ -13,7 +13,7 @@ conda info --envs
 base                  *  /home/correa/miniconda3
 clean_text               /home/correa/miniconda3/envs/clean_text
 word2vec                 /home/correa/miniconda3/envs/word2vec
-word2vec                 /home/correa/miniconda3/envs/model_bert_training
+model_bert_training                 /home/correa/miniconda3/envs/model_bert_training
 ```
 * From the base environment, install the following packages in the "model_bert_training" environment
   * huggingface transformers
@@ -24,6 +24,7 @@ word2vec                 /home/correa/miniconda3/envs/model_bert_training
   * scikit-learn
 ```
 conda install -n model_bert_training -c huggingface transformers
+conda install -n model_bert_training -c huggingface -c conda-forge datasets
 conda install -n model_bert_training pytorch==2.0.1 torchvision==0.15.2 torchaudio==2.0.2 pytorch-cuda=11.7 -c pytorch -c nvidia
 conda install -n model_bert_training numpy
 conda install -n model_bert_training scikit-learn
@@ -60,10 +61,6 @@ mkdir model_bert_training
 ```
 cd ./model_bert_training
 mkdir data
-```
-* Create a directory inside "model_bert_training" called "output"
-```
-mkdir output
 ```
 * Create the python script "model_covid_twitter_bert_training.py"
 ```
@@ -125,7 +122,7 @@ squeue -u correa
 JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
 449092      STUD     test   correa  R       1:04      1 stud-000
 ```
-* Once the job is finished the folder will include "model_covid_twitter_bert.model" and "models" folders and err and log files
+* Once the job is finished the folder will include "models" and "model_covid_twitter_bert.model" folders and err and log files
 ```
 (base) correa@master:~/model_bert_training/models/covid-twitter-bert-fine-tuned-regression$ ls -ltr
 total 80
