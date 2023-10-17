@@ -1,18 +1,23 @@
 import sys, getopt
 
 arguments = sys.argv[1:]
-short_options = "t:"
-long_options = ["train="]
+short_options = "t:s:e:"
+long_options = ["train=", "startDate=", "endDate="]
 
 options, values = getopt.getopt(arguments, short_options, long_options)
 
 for o, v in options:
-    print(f"Option is {o}. Value for 'train' is {v}.")
+    print(f"Option is {o}. Value is {v}.")
     if o == "-t" or o == "--train":
         if v == "True":
             train_arg = True
         else:
             train_arg = False
+
+    if o == "-s" or o == "--startDate":
+        startDate = v
+    if o == "-e" or o == "--endDate":
+        endDate = v
 
 import torch
 import pandas as pd
@@ -55,8 +60,9 @@ g_cases_filename = f"./data/g_cases_2021.csv"
 y = pd.read_csv(g_cases_filename)
 
 X = pd.DataFrame()
-date_ranges = [['2021-01-01', '2021-04-01']]
+# date_ranges = [['2021-01-01', '2021-04-01']]
 # date_ranges = [['2020-01-01', '2020-01-12']]
+date_ranges = [[startDate, endDate]]
 for date_range in date_ranges:
     start = datetime.datetime.strptime(date_range[0], "%Y-%m-%d")
     end = datetime.datetime.strptime(date_range[1], "%Y-%m-%d")
@@ -151,7 +157,7 @@ def preprocess_function(examples):
     return examples
 
 for split in ds:
-    ds[split] = ds[split].map(preprocess_function, remove_columns=["date", "total_cases", "g_values", "created_at", "clean_tweets"])
+    ds[split] = ds[split].map(preprocess_function, remove_columns=["__index_level_0__", "date", "total_cases", "g_values", "created_at", "clean_tweets"])
     # ds[split] = ds[split].map(preprocess_function, remove_columns=["date", "total_cases", "g_values", "created_at", "clean_tweets"], batched=True)
 
 print("ds")

@@ -95,9 +95,15 @@ When running the script you can send some command line arguments
 ### train
 * Value: False or True
 * name: -t or --train
+### start date
+* Value: 2021-12-24
+* name: -s or --startDate
+### merge (not included)
+* Value: 2021-12-25
+* name: -e or --endDate
 ```
-model_covid_twitter_bert_training.py -t False
-model_covid_twitter_bert_training.py --train True
+model_covid_twitter_bert_training.py -t False -s 2021-01-29 -e 2021-02-04
+model_covid_twitter_bert_training.py --train True --startDate 2021-01-29 --endDate 2021-02-04
 ```
 
 ## Run script
