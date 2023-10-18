@@ -8,5 +8,5 @@
 *.model
 *.zip
 *.pickle
-*.ipynb
+# *.ipynb
 *.pdf
