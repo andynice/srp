@@ -34,8 +34,6 @@ from time import time
 BASE_MODEL = "./covid-twitter-bert-v2"
 
 MAX_LENGTH = 512
-# BATCH_SIZE = 16
-BATCH_SIZE = 2
 
 tokenizer = AutoTokenizer.from_pretrained(BASE_MODEL)
 data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
