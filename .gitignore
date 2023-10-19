@@ -13,3 +13,4 @@
 *.pdf
 *.ods
 *.npy
+**/output_unclean_tweets
