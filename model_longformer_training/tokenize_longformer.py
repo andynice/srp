@@ -30,8 +30,6 @@ from time import time
 BASE_MODEL = "./longformer-base-4096"
 
 MAX_LENGTH = 4096
-# BATCH_SIZE = 16
-BATCH_SIZE = 2
 
 tokenizer = AutoTokenizer.from_pretrained(BASE_MODEL)
 data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
