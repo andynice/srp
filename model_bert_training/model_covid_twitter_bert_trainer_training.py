@@ -56,7 +56,6 @@ if train:
 else:
     BASE_MODEL = "./" + trained_model_name
 LEARNING_RATE = 2e-5
-# MAX_LENGTH = 256
 # BATCH_SIZE = 16
 BATCH_SIZE = 2
 EPOCHS = 20
@@ -122,47 +121,13 @@ raw_train_ds = Dataset.from_pandas(train_df)
 raw_val_ds = Dataset.from_pandas(val_df)
 raw_test_ds = Dataset.from_pandas(test_df)
 
-max_length = tokenizer.model_max_length
-print("Maximum input sequence length:", max_length)
-# Maximum input sequence length: 1000000000000000019884624838656
-
 ds = {"train": raw_train_ds, "validation": raw_val_ds, "test": raw_test_ds}
 
 print("ds")
 print(ds)
 
-# CALCULATE MAX_LENGTH
-# Tokenize all tweets to find the maximum tokenized length
-# max_length = 0
-
-# for index, row in X.iterrows():
-#     tweet = row['clean_tweets']
-
-#     # Tokenize the tweet
-#     tokens = tokenizer(tweet, return_tensors="pt")
-
-#     # Get the length of the tokenized sequence
-#     length = tokens['input_ids'].shape[1]
-#     print(f"current length: {length}")
-
-#     # Update max_length if needed
-#     if length > max_length:
-#         max_length = length
-
-# print(f"Calculated max_length: {max_length}")
-# Model's max length
-max_length = 512
-# RuntimeError: The size of tensor a (600) must match the size of tensor b (512) at non-singleton dimension 1
-
 def preprocess_function(examples):
     label = examples["g_values"] 
-    # examples = tokenizer(examples["clean_tweets"], truncation=True, padding="max_length", max_length=256)
-    # examples = tokenizer(examples["clean_tweets"], truncation=False, padding=True, return_tensors="pt")
-    # examples = tokenizer(examples["clean_tweets"], truncation=True, padding="max_length", max_length=max_length)
-    # examples = tokenizer(examples["clean_tweets"], truncation=True, padding="max_length")
-    
-    # examples = tokenizer(examples["clean_tweets"])
-
     print("examples['tokenized_tweets']")
     print(examples["tokenized_tweets"])
     s = examples["tokenized_tweets"].replace("\'", "\"")
@@ -170,13 +135,7 @@ def preprocess_function(examples):
     
 
     examples["label"] = float(label)
-    # examples["label"] = [float(i) for i in label]
-    # print(examples)
     return examples
-
-# for split in ds:
-    # ds[split] = ds[split].map(preprocess_function, remove_columns=["__index_level_0__", "date", "total_cases", "g_values", "created_at", "clean_tweets"])
-    # ds[split] = ds[split].map(preprocess_function, remove_columns=["date", "total_cases", "g_values", "created_at", "clean_tweets"], batched=True)
 
 if train:
     ds["train"] = ds["train"].map(preprocess_function, remove_columns=["__index_level_0__", "date", "total_cases", "g_values", "created_at", "tokenized_tweets"])
