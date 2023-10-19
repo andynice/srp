@@ -1,19 +1,33 @@
 import sys, getopt
+google_colab = False
 
-arguments = sys.argv[1:]
-short_options = "t:"
-long_options = ["train="]
+if google_colab:
+    root_path = "/content"
+    train_arg = True
+    startDate = '2021-01-01'
+    endDate = '2021-04-01'
+else:
+    root_path = "."
+    arguments = sys.argv[1:]
+    short_options = "t:s:e:"
+    long_options = ["train=", "startDate=", "endDate="]
 
-options, values = getopt.getopt(arguments, short_options, long_options)
+    options, values = getopt.getopt(arguments, short_options, long_options)
 
-for o, v in options:
-    print(f"Option is {o}. Value for 'train' is {v}.")
-    if o == "-t" or o == "--train":
-        if v == "True":
-            train_arg = True
-        else:
-            train_arg = False
+    for o, v in options:
+        print(f"Option is {o}. Value is {v}.")
+        if o == "-t" or o == "--train":
+            if v == "True":
+                train_arg = True
+            else:
+                train_arg = False
 
+        if o == "-s" or o == "--startDate":
+            startDate = v
+        if o == "-e" or o == "--endDate":
+            endDate = v
+
+import json
 import torch
 import pandas as pd
 import datetime
@@ -28,17 +42,19 @@ from time import time
 
 # TRAIN OR EVAL
 train = train_arg
-trained_model_name = "model_longformer.model"
+trained_model_name = "model_longformer_trainer.model"
 
 # MODEL DEFINITION
 if train:
-    BASE_MODEL = "./longformer-base-4096"
+    if google_colab:
+        BASE_MODEL = "allenai/longformer-base-4096"
+    else:
+        BASE_MODEL = f"{root_path}/longformer-base-4096"
 else:
     BASE_MODEL = "./" + trained_model_name
 LEARNING_RATE = 2e-5
-# MAX_LENGTH = 256
 # BATCH_SIZE = 16
-BATCH_SIZE = 4
+BATCH_SIZE = 1
 EPOCHS = 20
 
 tokenizer = AutoTokenizer.from_pretrained(BASE_MODEL)
@@ -48,12 +64,13 @@ model.to(device)
 
 # DATA PREPARATION
 
-g_cases_filename = f"./data/g_cases_2021.csv"
+g_cases_filename = f"{root_path}/data/g_cases_2021.csv"
 y = pd.read_csv(g_cases_filename)
 
 X = pd.DataFrame()
-date_ranges = [['2021-01-01', '2021-04-01']]
+# date_ranges = [['2021-01-01', '2021-04-01']]
 # date_ranges = [['2020-01-01', '2020-01-12']]
+date_ranges = [[startDate, endDate]]
 for date_range in date_ranges:
     start = datetime.datetime.strptime(date_range[0], "%Y-%m-%d")
     end = datetime.datetime.strptime(date_range[1], "%Y-%m-%d")
@@ -62,13 +79,13 @@ for date_range in date_ranges:
     for date in date_generated:
         date_str = date.strftime("%Y-%m-%d")
 
-        filename = f"./data/en_{date_str}_output.csv"
+        # filename = f"./data/en_{date_str}_output.csv"
+        filename = f"{root_path}/tokenize_longformer_output/tok_{date_str}_output.csv"
         df_data = pd.read_csv(filename)
-        df_data = df_data.replace(r'^\s*$', np.nan, regex=True)
-        #X = total_dataframe.append(df_data, ignore_index=True)
         X = pd.concat([X, df_data], ignore_index=True)
 
 print(f"X.shape: {X.shape}")
+print(f"X.head(): {X.head()}")
 
 train_ratio = 0.70
 validation_ratio = 0.15
@@ -101,54 +118,28 @@ raw_train_ds = Dataset.from_pandas(train_df)
 raw_val_ds = Dataset.from_pandas(val_df)
 raw_test_ds = Dataset.from_pandas(test_df)
 
-max_length = tokenizer.model_max_length
-print("Maximum input sequence length:", max_length)
-# Maximum input sequence length: 1000000000000000019884624838656
-
 ds = {"train": raw_train_ds, "validation": raw_val_ds, "test": raw_test_ds}
 
 print("ds")
 print(ds)
 
-# CALCULATE MAX_LENGTH
-# Tokenize all tweets to find the maximum tokenized length
-# max_length = 0
-
-# for index, row in X.iterrows():
-#     tweet = row['clean_tweets']
-
-#     # Tokenize the tweet
-#     tokens = tokenizer(tweet, return_tensors="pt")
-
-#     # Get the length of the tokenized sequence
-#     length = tokens['input_ids'].shape[1]
-#     print(f"current length: {length}")
-
-#     # Update max_length if needed
-#     if length > max_length:
-#         max_length = length
-
-# print(f"Calculated max_length: {max_length}")
-# Model's max length
-max_length = 4096
-
 def preprocess_function(examples):
     label = examples["g_values"] 
-    # examples = tokenizer(examples["clean_tweets"], truncation=True, padding="max_length", max_length=256)
-    # examples = tokenizer(examples["clean_tweets"], truncation=False, padding=True, return_tensors="pt")
-    examples = tokenizer(examples["clean_tweets"], truncation=True, padding="max_length", max_length=max_length)
-    # examples = tokenizer(examples["clean_tweets"], truncation=True, padding="max_length")
     
-    # examples = tokenizer(examples["clean_tweets"])
+    print("examples['tokenized_tweets']")
+    print(examples["tokenized_tweets"])
+    s = examples["tokenized_tweets"].replace("\'", "\"")
+    examples = json.loads(s)
+    
 
     examples["label"] = float(label)
-    # examples["label"] = [float(i) for i in label]
-    # print(examples)
     return examples
 
-for split in ds:
-    ds[split] = ds[split].map(preprocess_function, remove_columns=["date", "total_cases", "g_values", "created_at", "clean_tweets"])
-    # ds[split] = ds[split].map(preprocess_function, remove_columns=["date", "total_cases", "g_values", "created_at", "clean_tweets"], batched=True)
+if train:
+    ds["train"] = ds["train"].map(preprocess_function, remove_columns=["__index_level_0__", "date", "total_cases", "g_values", "created_at", "tokenized_tweets"])
+    ds["validation"] = ds["validation"].map(preprocess_function, remove_columns=["__index_level_0__", "date", "total_cases", "g_values", "created_at", "tokenized_tweets"])
+else:
+    ds["test"] = ds["test"].map(preprocess_function, remove_columns=["__index_level_0__", "date", "total_cases", "g_values", "created_at", "tokenized_tweets"])
 
 print("ds")
 print(ds)
@@ -183,9 +174,12 @@ training_args = TrainingArguments(
     per_device_train_batch_size=BATCH_SIZE,
     per_device_eval_batch_size=BATCH_SIZE,
     num_train_epochs=EPOCHS,
-    evaluation_strategy="epoch",
-    save_strategy="epoch",
-    metric_for_best_model="accuracy",
+    # evaluation_strategy="epoch",
+    evaluation_strategy="steps",
+    eval_steps=10,
+    save_total_limit = 5,
+    # save_strategy="no",
+    metric_for_best_model="mse",
     load_best_model_at_end=True,
     weight_decay=0.01,
 )
