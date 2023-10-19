@@ -11,3 +11,4 @@
 # *.ipynb
 **/.ipynb_checkpoints**
 *.pdf
+*.ods
