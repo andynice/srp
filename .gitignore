@@ -9,4 +9,5 @@
 *.zip
 *.pickle
 # *.ipynb
+**/.ipynb_checkpoints**
 *.pdf
